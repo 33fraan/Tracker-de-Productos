@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fortis — Tracker de Productos</title>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<style>
+:root { color-scheme: light; --accent: #18181b; --green: #16a34a; --yellow: #d97706; --red: #dc2626; --blue: #2563eb; --purple: #7c3aed; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f4f5; color: #18181b; font-size: 13px; min-height: 100vh; }
+
+/* ── HEADER ── */
+.header { background: #18181b; color: #fff; padding: 0 28px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 28px; height: 28px; background: #30d158; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.4px; }
+.logo-sub { font-size: 11px; color: #71717a; }
+.header-actions { display: flex; gap: 8px; }
+.btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
+.btn-primary { background: #30d158; color: #000; }
+.btn-primary:hover { background: #25b34a; }
+.btn-ghost { background: rgba(255,255,255,.08); color: #fff; }
+.btn-ghost:hover { background: rgba(255,255,255,.15); }
+
+/* ── STATS ── */
+.stats-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; background: #fff; border-bottom: 1px solid #e4e4e7; }
+.stat { padding: 14px 20px; border-right: 1px solid #e4e4e7; }
+.stat:last-child { border-right: none; }
+.stat-val { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.stat-label { font-size: 10px; color: #71717a; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+/* ── FILTERS ── */
+.toolbar { padding: 12px 24px; display: flex; gap: 8px; align-items: center; background: #f4f4f5; flex-wrap: wrap; }
+.input-search { background: #fff; border: 1px solid #e4e4e7; border-radius: 8px; padding: 7px 12px 7px 32px; font-size: 12px; color: #18181b; width: 200px; position: relative; }
+.search-wrap { position: relative; }
+.search-wrap::before { content: "⌕"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #a1a1aa; font-size: 14px; pointer-events: none; }
+select.filter { background: #fff; border: 1px solid #e4e4e7; border-radius: 8px; padding: 7px 10px; font-size: 12px; color: #18181b; }
+.ml-auto { margin-left: auto; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; padding: 0 24px 32px; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-top: 10px; }
+th { background: #fafafa; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #71717a; padding: 10px 14px; text-align: left; white-space: nowrap; border-bottom: 1px solid #f0f0f0; }
+td { padding: 11px 14px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafafa; }
+
+/* ── BADGES ── */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; letter-spacing: 0.2px; }
+.bg-green { background: #dcfce7; color: #15803d; }
+.bg-red { background: #fee2e2; color: #b91c1c; }
+.bg-yellow { background: #fef9c3; color: #a16207; }
+.bg-blue { background: #dbeafe; color: #1d4ed8; }
+.bg-purple { background: #ede9fe; color: #6d28d9; }
+.bg-orange { background: #ffedd5; color: #c2410c; }
+.bg-gray { background: #f4f4f5; color: #52525b; }
+
+/* ── MARGIN CELL ── */
+.margin-big { font-size: 15px; font-weight: 800; }
+.margin-sub { font-size: 10px; color: #71717a; margin-top: 1px; }
+
+/* ── ACTIONS ── */
+.row-actions { display: flex; gap: 5px; }
+.btn-xs { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; }
+.btn-edit-xs { background: #eff6ff; color: #1d4ed8; }
+.btn-del-xs { background: #fef2f2; color: #b91c1c; }
+.btn-edit-xs:hover { background: #dbeafe; }
+.btn-del-xs:hover { background: #fee2e2; }
+
+.product-name { font-weight: 600; font-size: 12.5px; }
+.empty-row { text-align: center; color: #a1a1aa; padding: 60px 20px; font-size: 14px; }
+
+/* ── MODAL ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; align-items: flex-start; justify-content: center; padding-top: 40px; overflow-y: auto; }
+.overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 16px; width: 640px; max-width: 96vw; margin-bottom: 40px; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+.modal-header { padding: 20px 24px 0; display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-close { background: #f4f4f5; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 14px; color: #71717a; display: flex; align-items: center; justify-content: center; }
+.modal-close:hover { background: #e4e4e7; }
+.modal-body { padding: 16px 24px 24px; }
+
+/* PDF Drop Zone */
+.pdf-zone { border: 2px dashed #e4e4e7; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all .2s; margin-bottom: 16px; background: #fafafa; }
+.pdf-zone:hover, .pdf-zone.drag { border-color: #30d158; background: #f0fdf4; }
+.pdf-zone-icon { font-size: 28px; margin-bottom: 6px; }
+.pdf-zone-text { font-size: 12px; color: #71717a; }
+.pdf-zone-text strong { color: #18181b; }
+.pdf-status { margin-top: 8px; font-size: 11px; padding: 6px 10px; border-radius: 6px; display: none; }
+.pdf-status.loading { background: #eff6ff; color: #1d4ed8; display: block; }
+.pdf-status.success { background: #f0fdf4; color: #15803d; display: block; }
+.pdf-status.error { background: #fef2f2; color: #b91c1c; display: block; }
+
+/* Form */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: 10px; font-weight: 700; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input { border: 1px solid #e4e4e7; border-radius: 8px; padding: 8px 10px; font-size: 13px; color: #18181b; width: 100%; background: #fff; transition: border .15s; }
+.form-input:focus { outline: none; border-color: #18181b; }
+textarea.form-input { resize: vertical; min-height: 56px; }
+.form-divider { grid-column: 1 / -1; border: none; border-top: 1px solid #f0f0f0; margin: 4px 0; }
+
+/* Margin Preview */
+.margin-preview { grid-column: 1 / -1; background: #18181b; color: #fff; border-radius: 10px; padding: 14px 16px; }
+.margin-preview-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #71717a; margin-bottom: 10px; }
+.margin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.mg-item { }
+.mg-val { font-size: 16px; font-weight: 800; }
+.mg-label { font-size: 9px; color: #71717a; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.3px; }
+.mg-green { color: #30d158; }
+.mg-red { color: #ff453a; }
+.mg-yellow { color: #ffd60a; }
+.mg-white { color: #fff; }
+
+.modal-footer { padding: 0 24px 20px; display: flex; gap: 8px; justify-content: flex-end; }
+.btn-modal-save { background: #18181b; color: #fff; border: none; padding: 10px 22px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.btn-modal-save:hover { background: #27272a; }
+.btn-modal-cancel { background: #f4f4f5; color: #18181b; border: none; padding: 10px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* Cost breakdown toggle */
+.cost-toggle { font-size: 10px; color: #2563eb; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; }
+.cost-breakdown { display: none; }
+.cost-breakdown.open { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text">Fortis Tracker</div>
+      <div class="logo-sub">ML Argentina · Análisis de productos</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn btn-ghost" onclick="saveSnapshot()" title="Descarga el archivo con todos tus datos adentro">💾 Guardar copia</button>
+    <button class="btn btn-primary" onclick="openModal()">+ Producto</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar" id="stats"></div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <input class="input-search" type="text" placeholder="Buscar producto o proveedor..." oninput="render()" id="fSearch">
+  </div>
+  <select class="filter" onchange="render()" id="fCat">
+    <option value="">Todas las categorías</option>
+    <option>Suplementación</option>
+    <option>Skincare</option>
+    <option>Químicos</option>
+  </select>
+  <select class="filter" onchange="render()" id="fStatus">
+    <option value="">Todos los estados</option>
+    <option>Analizar</option>
+    <option>Testear</option>
+    <option>Activo</option>
+    <option>Descartado</option>
+  </select>
+  <select class="filter" onchange="render()" id="fAnmat">
+    <option value="">ANMAT — todos</option>
+    <option>Sí</option>
+    <option>No</option>
+    <option>Zona gris</option>
+  </select>
+  <select class="filter" onchange="render()" id="fSort">
+    <option value="margen">↓ Mayor margen</option>
+    <option value="nombre">A-Z nombre</option>
+    <option value="precio">↓ Precio ML</option>
+    <option value="estado">Estado</option>
+  </select>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Proveedor</th>
+        <th>$ Mayor</th>
+        <th>MOQ / Inv.</th>
+        <th>$ ML</th>
+        <th>Desglose costos</th>
+        <th>Margen neto</th>
+        <th>Competencia</th>
+        <th>ANMAT</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Nuevo producto</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- PDF ZONE -->
+      <div class="pdf-zone" id="pdfZone"
+        onclick="document.getElementById('pdfInput').click()"
+        ondragover="e=>{e.preventDefault();document.getElementById('pdfZone').classList.add('drag')}"
+        ondragleave="document.getElementById('pdfZone').classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <div class="pdf-zone-icon">📄</div>
+        <div class="pdf-zone-text"><strong>Arrastrá la propuesta en PDF</strong> o hacé clic para seleccionarla<br>El sistema extrae automáticamente precios, MOQ y nombre del producto</div>
+        <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="handleFile(this.files[0])">
+        <div class="pdf-status" id="pdfStatus"></div>
+      </div>
+
+      <!-- FORM -->
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Nombre del producto</label>
+          <input class="form-input" id="fNombre" type="text" placeholder="Ej: Melena de León Doble Extracto 60ml">
+        </div>
+        <div class="form-group">
+          <label>Categoría</label>
+          <select class="form-input" id="fCategoria">
+            <option>Suplementación</option>
+            <option>Skincare</option>
+            <option>Químicos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select class="form-input" id="fEstado">
+            <option>Analizar</option>
+            <option>Testear</option>
+            <option>Activo</option>
+            <option>Descartado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Proveedor</label>
+          <input class="form-input" id="fProveedor" type="text" placeholder="Ej: Fungiteca">
+        </div>
+        <div class="form-group">
+          <label>Web proveedor</label>
+          <input class="form-input" id="fWeb" type="text" placeholder="fungiteca.com.ar">
+        </div>
+
+        <hr class="form-divider">
+
+        <div class="form-group">
+          <label>Precio mayorista (ARS)</label>
+          <input class="form-input" id="fMayor" type="number" placeholder="14000" oninput="calcPreview()">
+        </div>
+        <div class="form-group">
+          <label>MOQ (unidades mínimas)</label>
+          <input class="form-input" id="fMoq" type="number" placeholder="4">
+        </div>
+        <div class="form-group">
+          <label>Precio venta ML (ARS)</label>
+          <input class="form-input" id="fMl" type="number" placeholder="30000" oninput="calcPreview()">
+        </div>
+        <div class="form-group">
+          <label>Tipo publicación ML</label>
+          <select class="form-input" id="fTipoML" onchange="syncComision(); calcPreview()">
+            <option value="17">Premium (17%)</option>
+            <option value="13">Clásica (13%)</option>
+            <option value="0">Gratuita (0%)</option>
+          </select>
+        </div>
+
+        <!-- Costos avanzados -->
+        <div class="form-group full">
+          <span class="cost-toggle" onclick="toggleCosts()">▶ Ver/editar costos detallados (envío, IVA, IIBB)</span>
+          <div class="cost-breakdown" id="costBreakdown">
+            <div class="form-group">
+              <label>Comisión ML (%)</label>
+              <input class="form-input" id="fComision" type="number" value="17" oninput="calcPreview()">
+            </div>
+            <div class="form-group">
+              <label>IVA sobre comisión (%)</label>
+              <input class="form-input" id="fIva" type="number" value="21" oninput="calcPreview()">
+            </div>
+            <div class="form-group">
+              <label>Costo envío estimado (ARS)</label>
+              <input class="form-input" id="fEnvio" type="number" value="4500" oninput="calcPreview()">
+            </div>
+            <div class="form-group">
+              <label>Ingresos Brutos (%)</label>
+              <input class="form-input" id="fIIBB" type="number" value="3" oninput="calcPreview()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Margin Preview -->
+        <div class="margin-preview" id="marginPreview">
+          <div class="margin-preview-title">Vista previa de márgenes</div>
+          <div class="margin-grid" id="marginGrid">
+            <div class="mg-item"><div class="mg-val mg-white">—</div><div class="mg-label">Ganancia/u</div></div>
+            <div class="mg-item"><div class="mg-val mg-white">—</div><div class="mg-label">Margen neto</div></div>
+            <div class="mg-item"><div class="mg-val mg-white">—</div><div class="mg-label">Inversión MOQ</div></div>
+            <div class="mg-item"><div class="mg-val mg-white">—</div><div class="mg-label">Unidades para recuperar</div></div>
+          </div>
+        </div>
+
+        <hr class="form-divider">
+
+        <div class="form-group">
+          <label>Competencia en ML</label>
+          <select class="form-input" id="fCompetencia">
+            <option>Baja</option>
+            <option>Media</option>
+            <option>Alta</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>ANMAT</label>
+          <select class="form-input" id="fAnmatP">
+            <option>No</option>
+            <option>Sí</option>
+            <option>Zona gris</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Notas</label>
+          <textarea class="form-input" id="fNotas" placeholder="Contacto del proveedor, riesgos, diferencial, ángulo de marketing..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-modal-save" onclick="saveProduct()">Guardar producto</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ────────────────────────────────────────────────────────────────
+// PRODUCTOS INICIALES
+// ────────────────────────────────────────────────────────────────
+let products = [
+  { id:1,  nombre:"Melena de León Extracto 60ml",    categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:14000, moq:4,  ml:30000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Baja",  anmat:"Sí",       estado:"Analizar",   notas:"Hero product. Ángulo: memoria y foco. Doble extracción etanol+agua. ANMAT vigente. Inversión mínima $448k (32 goteros totales, 4 por variedad)." },
+  { id:2,  nombre:"Pack x2 Melena de León 60ml",     categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:28000, moq:2,  ml:58000, comision:17, iva:21, envio:5000, iibb:3, competencia:"Baja",  anmat:"Sí",       estado:"Analizar",   notas:"Combo recomendado. 2 meses de suministro. Menor competencia directa que suelto. Ticket alto para ML." },
+  { id:3,  nombre:"Reishi Extracto 60ml",            categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:14000, moq:4,  ml:27000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Media", anmat:"Sí",       estado:"Analizar",   notas:"Ángulo inmunidad y estrés crónico. Mercado más maduro. Considerar combo Reishi + Ashwagandha." },
+  { id:4,  nombre:"Cordyceps Extracto 60ml",         categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:14000, moq:4,  ml:27000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Media", anmat:"Sí",       estado:"Analizar",   notas:"Ángulo: energía y rendimiento físico. Crece en comunidad fitness. Buen complemento proteínas." },
+  { id:5,  nombre:"Ashwagandha Extracto 60ml",       categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:14000, moq:4,  ml:26000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Alta",  anmat:"Sí",       estado:"Analizar",   notas:"Mucha competencia en cápsulas, menos en extracto líquido. Diferencial: biodisponibilidad." },
+  { id:6,  nombre:"Shiitake Extracto 60ml",          categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:14000, moq:4,  ml:24000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Baja",  anmat:"Sí",       estado:"Analizar",   notas:"Mejor en combo (pack inmunidad con Reishi + Cola de Pavo). Poca demanda individual." },
+  { id:7,  nombre:"Cola de Pavo Extracto 60ml",      categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:14000, moq:4,  ml:24000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Baja",  anmat:"Sí",       estado:"Analizar",   notas:"Nicho: oncología integrativa, inmunidad. Comprador muy comprometido, fidelidad alta." },
+  { id:8,  nombre:"Tremella Extracto 60ml",          categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:14000, moq:4,  ml:26000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Baja",  anmat:"Sí",       estado:"Analizar",   notas:"Cruce con skincare: hidratación de piel desde adentro. Ángulo beauty-wellness potente." },
+  { id:9,  nombre:"Rhodiola Extracto 60ml",          categoria:"Suplementación", proveedor:"Fungiteca",      web:"fungiteca.com.ar",      mayor:14000, moq:4,  ml:26000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Baja",  anmat:"Sí",       estado:"Analizar",   notas:"Menos conocido en AR = menos demanda pero también menos competencia. Estrés + rendimiento cognitivo." },
+  { id:10, nombre:"Bisglicinato Magnesio + B6 60c",  categoria:"Suplementación", proveedor:"The Protein Lab",web:"theproteinlab.com.ar",  mayor:12599, moq:1,  ml:16999, comision:17, iva:21, envio:4500, iibb:3, competencia:"Alta",  anmat:"No",       estado:"Descartado", notas:"DESCARTADO. Proveedor vende en ML al mismo precio techo. Margen real ~12% antes de envío. No viable." },
+  { id:11, nombre:"Serum Péptidos K-Beauty (PDRN)",  categoria:"Skincare",       proveedor:"A confirmar",    web:"kosmeticos.com.ar",     mayor:30000, moq:0,  ml:70000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Media", anmat:"No",       estado:"Analizar",   notas:"Viral TikTok 2026. Medicube, TIRTIR. Cosmético tópico = sin ANMAT. Validar stock consistente." },
+  { id:12, nombre:"Matcha Serum / Crema K-Beauty",   categoria:"Skincare",       proveedor:"A confirmar",    web:"kosmeticos.com.ar",     mayor:28000, moq:0,  ml:65000, comision:17, iva:21, envio:4500, iibb:3, competencia:"Baja",  anmat:"No",       estado:"Analizar",   notas:"Incipiente ML AR (<10 listings). TIRTIR matcha PDRN explota en EU/USA. Mayor upside pero validar stock." },
+  { id:13, nombre:"Colágeno Gomitas Premium importado",categoria:"Suplementación",proveedor:"A confirmar",   web:"gennuine.com.ar",       mayor:35000, moq:0,  ml:80000, comision:17, iva:21, envio:5000, iibb:3, competencia:"Media", anmat:"No",       estado:"Analizar",   notas:"Dominado por Arcor/Bagó en low-price. Oportunidad en premium con biotin + HA + vitamina C importado." }
+];
+
+// ── PERSISTENCIA localStorage ────────────────────────────────────
+const STORAGE_KEY = 'fortis_products_v1';
+const STORAGE_ID  = 'fortis_nextid_v1';
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    localStorage.setItem(STORAGE_ID,  String(nextId));
+  } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const rid = localStorage.getItem(STORAGE_ID);
+    if (raw) { products = JSON.parse(raw); }
+    if (rid)  { nextId = parseInt(rid) || 50; }
+  } catch(e) {}
+}
+
+loadFromStorage();
+let editId = null;
+let nextId = nextId || 50;
+
+// ────────────────────────────────────────────────────────────────
+// CÁLCULO DE MARGEN REAL
+// ────────────────────────────────────────────────────────────────
+function calcMargen(p) {
+  if (!p.mayor || !p.ml) return null;
+  const comARS    = p.ml * (p.comision / 100);
+  const ivaARS    = comARS * (p.iva / 100);
+  const iibbARS   = p.ml * (p.iibb / 100);
+  const totalCost = p.mayor + comARS + ivaARS + (p.envio || 0) + iibbARS;
+  const ganancia  = p.ml - totalCost;
+  const margen    = (ganancia / p.mayor) * 100;
+  return { ganancia: Math.round(ganancia), margen: Math.round(margen), comARS: Math.round(comARS), ivaARS: Math.round(ivaARS), iibbARS: Math.round(iibbARS), totalCost: Math.round(totalCost) };
+}
+
+// ────────────────────────────────────────────────────────────────
+// RENDER
+// ────────────────────────────────────────────────────────────────
+function render() {
+  const search = document.getElementById('fSearch').value.toLowerCase();
+  const cat    = document.getElementById('fCat').value;
+  const status = document.getElementById('fStatus').value;
+  const anmat  = document.getElementById('fAnmat').value;
+  const sort   = document.getElementById('fSort').value;
+
+  let list = products.filter(p => {
+    if (search && !p.nombre.toLowerCase().includes(search) && !p.proveedor.toLowerCase().includes(search)) return false;
+    if (cat    && p.categoria  !== cat)    return false;
+    if (status && p.estado     !== status) return false;
+    if (anmat  && p.anmat      !== anmat)  return false;
+    return true;
+  });
+
+  list.sort((a,b) => {
+    if (sort === 'margen') {
+      const ma = calcMargen(a), mb = calcMargen(b);
+      return (mb ? mb.margen : -999) - (ma ? ma.margen : -999);
+    }
+    if (sort === 'nombre') return a.nombre.localeCompare(b.nombre);
+    if (sort === 'precio') return (b.ml||0) - (a.ml||0);
+    if (sort === 'estado') return a.estado.localeCompare(b.estado);
+    return 0;
+  });
+
+  const tbody = document.getElementById('tbody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="11" class="empty-row">No hay productos que coincidan.</td></tr>`;
+  } else {
+    tbody.innerHTML = list.map(p => {
+      const r = calcMargen(p);
+      const mVal  = r ? r.margen : null;
+      const mCol  = mVal === null ? '#71717a' : mVal >= 30 ? '#16a34a' : mVal >= 15 ? '#d97706' : '#dc2626';
+      const mText = mVal === null ? '—' : `${mVal}%`;
+      const inv   = p.mayor && p.moq ? `$${(p.mayor * p.moq).toLocaleString('es-AR')}` : '—';
+
+      const desgloseHTML = r ? `
+        <div style="font-size:10px;color:#71717a;line-height:1.8">
+          <span style="color:#dc2626">−$${r.comARS.toLocaleString('es-AR')}</span> com. &nbsp;
+          <span style="color:#dc2626">−$${r.ivaARS.toLocaleString('es-AR')}</span> IVA &nbsp;
+          <span style="color:#dc2626">−$${(p.envio||0).toLocaleString('es-AR')}</span> envío &nbsp;
+          <span style="color:#dc2626">−$${r.iibbARS.toLocaleString('es-AR')}</span> IIBB
+        </div>` : '<span style="color:#a1a1aa;font-size:10px">Sin datos</span>';
+
+      const statusMap = { Activo:'bg-green', Testear:'bg-blue', Analizar:'bg-yellow', Descartado:'bg-red' };
+      const compMap   = { Baja:'bg-green', Media:'bg-yellow', Alta:'bg-red' };
+      const anmatMap  = { Sí:'bg-green', No:'bg-gray', 'Zona gris':'bg-orange' };
+      const catMap    = { Suplementación:'bg-purple', Skincare:'bg-blue', Químicos:'bg-orange' };
+
+      return `<tr>
+        <td>
+          <div class="product-name">${p.nombre}</div>
+          <span class="badge ${catMap[p.categoria]||'bg-gray'}" style="font-size:9px;margin-top:3px;display:inline-block">${p.categoria}</span>
+        </td>
+        <td>
+          <div style="font-weight:600;font-size:12px">${p.proveedor}</div>
+          ${p.web ? `<div style="font-size:10px;color:#2563eb">${p.web}</div>` : ''}
+        </td>
+        <td style="font-weight:700">${p.mayor ? '$' + p.mayor.toLocaleString('es-AR') : '—'}</td>
+        <td>
+          <div style="font-weight:600">${p.moq ? p.moq + ' u.' : '—'}</div>
+          <div style="font-size:10px;color:#71717a">${inv}</div>
+        </td>
+        <td style="font-weight:700">${p.ml ? '$' + p.ml.toLocaleString('es-AR') : '—'}</td>
+        <td>${desgloseHTML}</td>
+        <td>
+          <div class="margin-big" style="color:${mCol}">${mText}</div>
+          ${r ? `<div class="margin-sub">$${r.ganancia.toLocaleString('es-AR')}/u</div>` : ''}
+        </td>
+        <td><span class="badge ${compMap[p.competencia]||'bg-gray'}">${p.competencia}</span></td>
+        <td><span class="badge ${anmatMap[p.anmat]||'bg-gray'}">${p.anmat}</span></td>
+        <td><span class="badge ${statusMap[p.estado]||'bg-gray'}">${p.estado}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="btn-xs btn-edit-xs" onclick="openModal(${p.id})">Editar</button>
+            <button class="btn-xs btn-del-xs" onclick="delProduct(${p.id})">✕</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Stats
+  const activos = products.filter(p => p.estado !== 'Descartado');
+  const margins = activos.filter(p => p.mayor && p.ml).map(p => calcMargen(p)).filter(Boolean).map(r => r.margen);
+  const avg = margins.length ? Math.round(margins.reduce((a,b)=>a+b,0)/margins.length) : 0;
+  const viables = margins.filter(m => m >= 30).length;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-val">${products.length}</div><div class="stat-label">Total productos</div></div>
+    <div class="stat"><div class="stat-val" style="color:${avg>=30?'#16a34a':avg>=15?'#d97706':'#dc2626'}">${avg}%</div><div class="stat-label">Margen promedio real</div></div>
+    <div class="stat"><div class="stat-val" style="color:#16a34a">${viables}</div><div class="stat-label">Prod. ≥30% margen</div></div>
+    <div class="stat"><div class="stat-val">${products.filter(p=>p.estado==='Activo').length}</div><div class="stat-label">Activos en ML</div></div>
+    <div class="stat"><div class="stat-val" style="color:#dc2626">${products.filter(p=>p.estado==='Descartado').length}</div><div class="stat-label">Descartados</div></div>
+  `;
+}
+
+// ────────────────────────────────────────────────────────────────
+// MARGIN PREVIEW (modal)
+// ────────────────────────────────────────────────────────────────
+function calcPreview() {
+  const mayor    = parseFloat(document.getElementById('fMayor').value) || 0;
+  const ml       = parseFloat(document.getElementById('fMl').value)    || 0;
+  const comision = parseFloat(document.getElementById('fComision').value) || 17;
+  const iva      = parseFloat(document.getElementById('fIva').value)      || 21;
+  const envio    = parseFloat(document.getElementById('fEnvio').value)    || 0;
+  const iibb     = parseFloat(document.getElementById('fIIBB').value)     || 0;
+  const moq      = parseInt(document.getElementById('fMoq').value)        || 1;
+
+  if (!mayor || !ml) {
+    document.getElementById('marginGrid').innerHTML = `
+      <div class="mg-item"><div class="mg-val mg-white">—</div><div class="mg-label">Ganancia/u</div></div>
+      <div class="mg-item"><div class="mg-val mg-white">—</div><div class="mg-label">Margen neto</div></div>
+      <div class="mg-item"><div class="mg-val mg-white">—</div><div class="mg-label">Inversión MOQ</div></div>
+      <div class="mg-item"><div class="mg-val mg-white">—</div><div class="mg-label">Unid. recupero</div></div>`;
+    return;
+  }
+
+  const comARS  = ml * (comision / 100);
+  const ivaARS  = comARS * (iva / 100);
+  const iibbARS = ml * (iibb / 100);
+  const total   = mayor + comARS + ivaARS + envio + iibbARS;
+  const gan     = ml - total;
+  const margen  = Math.round((gan / mayor) * 100);
+  const inv     = mayor * moq;
+  const recupero = gan > 0 ? Math.ceil(inv / gan) : '∞';
+
+  const mCol = margen >= 30 ? 'mg-green' : margen >= 15 ? 'mg-yellow' : 'mg-red';
+
+  document.getElementById('marginGrid').innerHTML = `
+    <div class="mg-item"><div class="mg-val ${mCol}">$${Math.round(gan).toLocaleString('es-AR')}</div><div class="mg-label">Ganancia/u</div></div>
+    <div class="mg-item"><div class="mg-val ${mCol}">${margen}%</div><div class="mg-label">Margen neto real</div></div>
+    <div class="mg-item"><div class="mg-val mg-white">$${inv.toLocaleString('es-AR')}</div><div class="mg-label">Inversión MOQ</div></div>
+    <div class="mg-item"><div class="mg-val mg-white">${recupero} u.</div><div class="mg-label">Unid. para recuperar</div></div>`;
+}
+
+function syncComision() {
+  const val = document.getElementById('fTipoML').value;
+  document.getElementById('fComision').value = val;
+}
+
+function toggleCosts() {
+  const el = document.getElementById('costBreakdown');
+  el.classList.toggle('open');
+  const tog = document.querySelector('.cost-toggle');
+  tog.textContent = el.classList.contains('open')
+    ? '▼ Ocultar costos detallados'
+    : '▶ Ver/editar costos detallados (envío, IVA, IIBB)';
+}
+
+// ────────────────────────────────────────────────────────────────
+// MODAL OPEN / CLOSE / SAVE
+// ────────────────────────────────────────────────────────────────
+function openModal(id) {
+  editId = id || null;
+  document.getElementById('modalTitle').textContent = id ? 'Editar producto' : 'Nuevo producto';
+  document.getElementById('pdfStatus').className = 'pdf-status';
+  document.getElementById('pdfStatus').textContent = '';
+
+  const defaults = { nombre:'', categoria:'Suplementación', estado:'Analizar', proveedor:'', web:'', mayor:'', moq:'', ml:'', comision:17, iva:21, envio:4500, iibb:3, competencia:'Media', anmat:'No', notas:'' };
+  const p = id ? products.find(x => x.id === id) : defaults;
+
+  document.getElementById('fNombre').value      = p.nombre     || '';
+  document.getElementById('fCategoria').value   = p.categoria  || 'Suplementación';
+  document.getElementById('fEstado').value      = p.estado     || 'Analizar';
+  document.getElementById('fProveedor').value   = p.proveedor  || '';
+  document.getElementById('fWeb').value         = p.web        || '';
+  document.getElementById('fMayor').value       = p.mayor      || '';
+  document.getElementById('fMoq').value         = p.moq        || '';
+  document.getElementById('fMl').value          = p.ml         || '';
+  document.getElementById('fTipoML').value      = p.comision === 13 ? '13' : p.comision === 0 ? '0' : '17';
+  document.getElementById('fComision').value    = p.comision   ?? 17;
+  document.getElementById('fIva').value         = p.iva        ?? 21;
+  document.getElementById('fEnvio').value       = p.envio      ?? 4500;
+  document.getElementById('fIIBB').value        = p.iibb       ?? 3;
+  document.getElementById('fCompetencia').value = p.competencia|| 'Media';
+  document.getElementById('fAnmatP').value      = p.anmat      || 'No';
+  document.getElementById('fNotas').value       = p.notas      || '';
+
+  calcPreview();
+  document.getElementById('overlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('costBreakdown').classList.remove('open');
+  document.querySelector('.cost-toggle').textContent = '▶ Ver/editar costos detallados (envío, IVA, IIBB)';
+}
+
+function saveProduct() {
+  const nombre = document.getElementById('fNombre').value.trim();
+  if (!nombre) { alert('Ingresá el nombre del producto.'); return; }
+  const p = {
+    nombre,
+    categoria:   document.getElementById('fCategoria').value,
+    estado:      document.getElementById('fEstado').value,
+    proveedor:   document.getElementById('fProveedor').value.trim(),
+    web:         document.getElementById('fWeb').value.trim(),
+    mayor:       parseFloat(document.getElementById('fMayor').value)    || 0,
+    moq:         parseInt(document.getElementById('fMoq').value)         || 0,
+    ml:          parseFloat(document.getElementById('fMl').value)        || 0,
+    comision:    parseFloat(document.getElementById('fComision').value)  || 17,
+    iva:         parseFloat(document.getElementById('fIva').value)       || 21,
+    envio:       parseFloat(document.getElementById('fEnvio').value)     || 0,
+    iibb:        parseFloat(document.getElementById('fIIBB').value)      || 0,
+    competencia: document.getElementById('fCompetencia').value,
+    anmat:       document.getElementById('fAnmatP').value,
+    notas:       document.getElementById('fNotas').value.trim()
+  };
+  if (editId) {
+    const idx = products.findIndex(x => x.id === editId);
+    products[idx] = { ...products[idx], ...p };
+  } else {
+    products.push({ id: nextId++, ...p });
+  }
+  saveToStorage();
+  closeModal();
+  render();
+}
+
+function delProduct(id) {
+  if (!confirm('¿Eliminás este producto?')) return;
+  products = products.filter(p => p.id !== id);
+  saveToStorage();
+  render();
+}
+
+// ────────────────────────────────────────────────────────────────
+// PDF PARSING
+// ────────────────────────────────────────────────────────────────
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('pdfZone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') handleFile(file);
+}
+
+async function handleFile(file) {
+  if (!file || file.type !== 'application/pdf') return;
+  setStatus('loading', '⏳ Extrayendo texto del PDF...');
+  try {
+    const ab   = await file.arrayBuffer();
+    const pdf  = await pdfjsLib.getDocument({ data: ab }).promise;
+    let text   = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page    = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(item => item.str).join(' ') + '\n';
+    }
+    parsePdfText(text, file.name);
+    setStatus('success', '✅ PDF leído. Revisá los campos y completá lo que falte.');
+  } catch(err) {
+    setStatus('error', '❌ No se pudo leer el PDF. Intentá con otro archivo.');
+    console.error(err);
+  }
+}
+
+function parsePdfText(text, filename) {
+  const norm = text.replace(/\s+/g,' ').toLowerCase();
+
+  // ── Proveedor / Nombre empresa ──────────────────────────────
+  const brandPatterns = [
+    /(?:bienvenido|sumate a|bienvenid[oa] a|de parte de|somos|empresa|marca)[:\s]+([A-Z][A-Za-záéíóú\s]{2,30})/i,
+    /^([A-Z][A-Z\s]{3,25})\s*[-–—|]/m
+  ];
+  let proveedor = '';
+  for (const bp of brandPatterns) {
+    const m = text.match(bp);
+    if (m) { proveedor = m[1].trim().replace(/\s+/g,' '); break; }
+  }
+  // Fallback: first capitalized phrase
+  if (!proveedor) {
+    const m = text.match(/([A-Z][A-Za-záéíóúñ]{2,}(?:\s+[A-Za-záéíóúñ]{2,}){0,3})/);
+    if (m) proveedor = m[1].trim();
+  }
+
+  // ── Precio mayorista ────────────────────────────────────────
+  const mayorPatterns = [
+    /precio\s+mayor(?:ista)?[:\s]+\$?\s*([\d.,]+)/i,
+    /(?:al\s+por\s+mayor|precio\s+de\s+costo|costo\s+por\s+unidad)[:\s]+\$?\s*([\d.,]+)/i,
+    /\$\s*([\d.,]+)\s+(?:por\s+unidad|c\/u|cada\s+una)/i
+  ];
+  let mayor = 0;
+  for (const mp of mayorPatterns) {
+    const m = norm.match(mp);
+    if (m) { mayor = parseNum(m[1]); break; }
+  }
+
+  // ── Precio sugerido de reventa (→ precio ML) ────────────────
+  const precioMLPatterns = [
+    /precio\s+(?:sugerido\s+(?:de\s+)?)?reventa[:\s]+\$?\s*([\d.,]+)/i,
+    /precio\s+(?:de\s+)?venta[:\s]+\$?\s*([\d.,]+)/i,
+    /precio\s+(?:al\s+)?p[uú]blico[:\s]+\$?\s*([\d.,]+)/i,
+    /p\.?v\.?p\.?[:\s]+\$?\s*([\d.,]+)/i
+  ];
+  let ml = 0;
+  for (const pp of precioMLPatterns) {
+    const m = norm.match(pp);
+    if (m) { ml = parseNum(m[1]); break; }
+  }
+
+  // ── MOQ ─────────────────────────────────────────────────────
+  const moqPatterns = [
+    /compra\s+(?:inicial\s+)?m[íi]nima[:\s]+(\d+)\s*(?:goteros|unidades|unid|u\.|caps|piezas)/i,
+    /m[íi]nimo[:\s]+(\d+)\s*(?:goteros|unidades|unid|u\.|caps|piezas)/i,
+    /(\d+)\s*(?:goteros|unidades|unid)\s+(?:como\s+)?m[íi]nimo/i,
+    /(\d+)\s*goteros/i
+  ];
+  let moq = 0;
+  for (const mp of moqPatterns) {
+    const m = text.match(mp);
+    if (m) { moq = parseInt(m[1]); break; }
+  }
+
+  // ── Nombre del producto ─────────────────────────────────────
+  const productKeywords = ['reishi','melena de le','cordyceps','shiitake','cola de pavo','tremella','ashwagandha','rhodiola','colágeno','magnesio','whey','creatina','vitamina','serum','crema','extracto','gotero'];
+  let productName = '';
+  for (const kw of productKeywords) {
+    if (norm.includes(kw)) {
+      // Try to get full line containing keyword
+      const lineM = text.match(new RegExp('.{0,20}' + kw + '.{0,40}', 'i'));
+      if (lineM) { productName = lineM[0].trim().replace(/\s+/g,' '); break; }
+    }
+  }
+  if (!productName && proveedor) productName = `Productos de ${proveedor}`;
+
+  // ── Categoría ───────────────────────────────────────────────
+  let categoria = 'Suplementación';
+  if (/serum|crema|skincare|cosmé|facial|kbeauty/i.test(text)) categoria = 'Skincare';
+  if (/ácido|químico|solvente|grado\s+alimentario/i.test(text)) categoria = 'Químicos';
+
+  // ── Web / email ─────────────────────────────────────────────
+  let web = '';
+  const webM = text.match(/(?:www\.)?([a-z0-9-]+\.(com\.ar|ar|com))/i);
+  if (webM) web = webM[0];
+
+  // ── ANMAT ───────────────────────────────────────────────────
+  let anmat = 'No';
+  if (/anmat|laboratorio\s+habilitado|rnpa/i.test(text)) anmat = 'Sí';
+
+  // ── Notas auto ─────────────────────────────────────────────
+  let notas = `Extraído de: ${filename}.`;
+  const emailM = text.match(/[\w.-]+@[\w.-]+\.\w+/);
+  if (emailM) notas += ` Email: ${emailM[0]}.`;
+  const telM   = text.match(/(\+54|0[0-9]{2,3})[.\s-]?[0-9]{4}[.\s-]?[0-9]{4}/);
+  if (telM)   notas += ` Tel: ${telM[0].trim()}.`;
+
+  // ── Populate form ───────────────────────────────────────────
+  if (proveedor)   document.getElementById('fProveedor').value   = proveedor;
+  if (web)         document.getElementById('fWeb').value         = web;
+  if (mayor)       document.getElementById('fMayor').value       = mayor;
+  if (ml)          document.getElementById('fMl').value          = ml;
+  if (moq)         document.getElementById('fMoq').value         = moq;
+  if (productName) document.getElementById('fNombre').value      = productName;
+  document.getElementById('fCategoria').value   = categoria;
+  document.getElementById('fAnmatP').value      = anmat;
+  document.getElementById('fNotas').value       = notas;
+  calcPreview();
+}
+
+function parseNum(str) {
+  // Handle "14.000" and "14,000" and "14000"
+  str = str.replace(/\./g,'').replace(/,/g,'.');
+  return parseFloat(str) || 0;
+}
+
+function setStatus(type, msg) {
+  const el = document.getElementById('pdfStatus');
+  el.className = `pdf-status ${type}`;
+  el.textContent = msg;
+}
+
+// ────────────────────────────────────────────────────────────────
+// EXPORT CSV
+// ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const headers = ['Producto','Categoría','Proveedor','Web','$ Mayor','MOQ','Inversión MOQ','$ ML','Com%','IVA%','Envío','IIBB%','Ganancia/u','Margen%','Competencia','ANMAT','Estado','Notas'];
+  const rows = products.map(p => {
+    const r = calcMargen(p);
+    return [
+      p.nombre, p.categoria, p.proveedor, p.web,
+      p.mayor, p.moq, p.mayor && p.moq ? p.mayor * p.moq : '',
+      p.ml, p.comision, p.iva, p.envio, p.iibb,
+      r ? r.ganancia : '', r ? r.margen : '',
+      p.competencia, p.anmat, p.estado, p.notas
+    ].map(v => `"${String(v??'').replace(/"/g,'""')}"`).join(',');
+  });
+  const csv = [headers.join(','), ...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,﻿' + encodeURIComponent(csv);
+  a.download = `fortis-tracker-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ────────────────────────────────────────────────────────────────
+// GUARDAR COPIA — descarga el HTML con los datos actuales adentro
+// ────────────────────────────────────────────────────────────────
+function saveSnapshot() {
+  const html = document.documentElement.outerHTML;
+  // Reemplaza el array de productos con el estado actual
+  const dataStr = JSON.stringify(products, null, 2);
+  const updated = html.replace(
+    /let products = \[[\s\S]*?\];\n\n\/\/ ── PERSISTENCIA/,
+    `let products = ${dataStr};\n\n// ── PERSISTENCIA`
+  );
+  const a = document.createElement('a');
+  a.href = 'data:text/html;charset=utf-8,' + encodeURIComponent(updated);
+  a.download = `fortis-tracker-${new Date().toISOString().slice(0,10)}.html`;
+  a.click();
+}
+
+// Close modal on backdrop
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closeModal();
+});
+
+render();
+</script>
+</body>
+</html>
