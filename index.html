@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fortis — Tracker de Productos</title>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root { color-scheme: light; --accent: #18181b; --green: #16a34a; --yellow: #d97706; --red: #dc2626; --blue: #2563eb; --purple: #7c3aed; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -67,6 +68,22 @@ tr:hover td { background: #fafafa; }
 .btn-del-xs { background: #fef2f2; color: #b91c1c; }
 .btn-edit-xs:hover { background: #dbeafe; }
 .btn-del-xs:hover { background: #fee2e2; }
+
+/* ── SYNC BADGE ── */
+.sync-badge { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:5px 11px; border-radius:20px; cursor:pointer; border:none; transition:all .2s; }
+.sync-badge.local   { background:rgba(255,255,255,.1); color:#a1a1aa; }
+.sync-badge.connected { background:rgba(48,209,88,.18); color:#30d158; }
+.sync-badge.syncing { background:rgba(255,193,7,.15); color:#fbbf24; }
+.sync-badge.error   { background:rgba(220,38,38,.15); color:#f87171; }
+.sync-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+/* ── SETUP MODAL ── */
+.setup-steps { background:#f8fafc; border-radius:10px; padding:14px 16px; margin-bottom:14px; }
+.setup-step  { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size:12px; line-height:1.5; }
+.setup-step:last-child { margin-bottom:0; }
+.step-num { background:#18181b; color:#fff; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; margin-top:1px; }
+.setup-sql { background:#18181b; color:#30d158; border-radius:8px; padding:12px; font-size:10.5px; font-family:monospace; white-space:pre; overflow-x:auto; margin:8px 0; }
+.migrate-box { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 14px; font-size:12px; color:#92400e; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
 
 .product-name { font-weight: 600; font-size: 12.5px; }
 .empty-row { text-align: center; color: #a1a1aa; padding: 60px 20px; font-size: 14px; }
@@ -137,8 +154,11 @@ textarea.form-input { resize: vertical; min-height: 56px; }
     </div>
   </div>
   <div class="header-actions">
+    <button id="syncBadge" class="sync-badge local" onclick="openSetupModal()" title="Configurar base de datos Supabase">
+      <span class="sync-dot"></span><span id="syncLabel">Local</span>
+    </button>
     <button class="btn btn-ghost" onclick="exportCSV()">⬇ CSV</button>
-    <button class="btn btn-ghost" onclick="saveSnapshot()" title="Descarga el archivo con todos tus datos adentro">💾 Guardar copia</button>
+    <button class="btn btn-ghost" onclick="saveSnapshot()" title="Descarga el archivo con todos tus datos adentro">💾 Copia</button>
     <button class="btn btn-primary" onclick="openModal()">+ Producto</button>
   </div>
 </div>
@@ -591,7 +611,7 @@ function closeModal() {
   document.querySelector('.cost-toggle').textContent = '▶ Ver/editar costos detallados (envío, IVA, IIBB)';
 }
 
-function saveProduct() {
+async function saveProduct() {
   const nombre = document.getElementById('fNombre').value.trim();
   if (!nombre) { alert('Ingresá el nombre del producto.'); return; }
   const p = {
@@ -614,19 +634,26 @@ function saveProduct() {
   if (editId) {
     const idx = products.findIndex(x => x.id === editId);
     products[idx] = { ...products[idx], ...p };
+    closeModal(); saveToStorage(); render();
+    if (supa) { setSyncStatus('syncing','Guardando…'); await supaUpdate(products[idx]); setSyncStatus('connected','☁ Conectado'); }
   } else {
-    products.push({ id: nextId++, ...p });
+    if (supa) {
+      setSyncStatus('syncing','Guardando…');
+      const saved = await supaInsert(p);
+      products.push(saved || { id: nextId++, ...p });
+      setSyncStatus('connected','☁ Conectado');
+    } else {
+      products.push({ id: nextId++, ...p });
+    }
+    closeModal(); saveToStorage(); render();
   }
-  saveToStorage();
-  closeModal();
-  render();
 }
 
-function delProduct(id) {
+async function delProduct(id) {
   if (!confirm('¿Eliminás este producto?')) return;
   products = products.filter(p => p.id !== id);
-  saveToStorage();
-  render();
+  saveToStorage(); render();
+  if (supa) { setSyncStatus('syncing','Eliminando…'); await supaDelete(id); setSyncStatus('connected','☁ Conectado'); }
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -820,7 +847,192 @@ document.getElementById('overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('overlay')) closeModal();
 });
 
-render();
+// ────────────────────────────────────────────────────────────────
+// SUPABASE INTEGRATION
+// ────────────────────────────────────────────────────────────────
+const SUPA_CFG_KEY = 'fortis_supa_cfg';
+let supa = null;
+
+function initSupabase() {
+  try {
+    const cfg = JSON.parse(localStorage.getItem(SUPA_CFG_KEY) || '{}');
+    if (cfg.url && cfg.key && window.supabase) {
+      supa = window.supabase.createClient(cfg.url, cfg.key);
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+function setSyncStatus(state, label) {
+  const badge = document.getElementById('syncBadge');
+  const lbl   = document.getElementById('syncLabel');
+  if (!badge) return;
+  badge.className = 'sync-badge ' + state;
+  lbl.textContent = label;
+}
+
+async function loadFromSupabase() {
+  if (!supa) return false;
+  setSyncStatus('syncing', 'Cargando…');
+  try {
+    const { data, error } = await supa.from('productos').select('*').order('id');
+    if (error) throw error;
+    products = data || [];
+    setSyncStatus('connected', '☁ Conectado');
+    return true;
+  } catch(e) {
+    console.error('Supabase load error:', e);
+    setSyncStatus('error', 'Error BD');
+    return false;
+  }
+}
+
+async function supaInsert(p) {
+  if (!supa) return null;
+  const { id: _id, ...data } = p; // let Supabase generate ID
+  const { data: rows, error } = await supa.from('productos').insert(data).select();
+  if (error) { console.error(error); setSyncStatus('error','Error BD'); return null; }
+  return rows?.[0] || null;
+}
+
+async function supaUpdate(p) {
+  if (!supa) return;
+  const { id, ...data } = p;
+  const { error } = await supa.from('productos').update(data).eq('id', id);
+  if (error) { console.error(error); setSyncStatus('error','Error BD'); }
+}
+
+async function supaDelete(id) {
+  if (!supa) return;
+  const { error } = await supa.from('productos').delete().eq('id', id);
+  if (error) { console.error(error); setSyncStatus('error','Error BD'); }
+}
+
+// ── SETUP MODAL ──────────────────────────────────────────────────
+function openSetupModal() {
+  const cfg = JSON.parse(localStorage.getItem(SUPA_CFG_KEY) || '{}');
+  document.getElementById('sUrl').value = cfg.url || '';
+  document.getElementById('sKey').value = cfg.key || '';
+  const migrateBox = document.getElementById('migrateBox');
+  if (migrateBox) {
+    const show = !supa && products.length > 0;
+    migrateBox.style.display = show ? 'flex' : 'none';
+    if (show) {
+      migrateBox.querySelector('span').innerHTML =
+        `📦 Tenés <strong>${products.length}</strong> productos locales. ¿Migramos a la nube?`;
+    }
+  }
+  document.getElementById('setupOverlay').classList.add('open');
+}
+function closeSetupModal() {
+  document.getElementById('setupOverlay').classList.remove('open');
+}
+
+async function connectSupabase() {
+  const url = document.getElementById('sUrl').value.trim();
+  const key = document.getElementById('sKey').value.trim();
+  if (!url || !key) { alert('Pegá la URL y el Anon Key de tu proyecto Supabase.'); return; }
+
+  setSyncStatus('syncing', 'Conectando…');
+  try {
+    const client = window.supabase.createClient(url, key);
+    const { error } = await client.from('productos').select('id').limit(1);
+    if (error) throw error;
+    supa = client;
+    localStorage.setItem(SUPA_CFG_KEY, JSON.stringify({ url, key }));
+    closeSetupModal();
+
+    const migrate = document.getElementById('chkMigrate')?.checked;
+    if (migrate && products.length) {
+      setSyncStatus('syncing', 'Migrando…');
+      for (const p of products) {
+        const { id: _id, ...data } = p;
+        await supa.from('productos').insert(data);
+      }
+    }
+    await loadFromSupabase();
+    saveToStorage();
+    render();
+  } catch(e) {
+    alert('No se pudo conectar. Verificá la URL y el Anon Key.\n\n' + (e.message || e));
+    setSyncStatus('error', 'Error BD');
+  }
+}
+
+function disconnectSupabase() {
+  if (!confirm('¿Desconectar Supabase? Los datos quedan en local.')) return;
+  localStorage.removeItem(SUPA_CFG_KEY);
+  supa = null;
+  setSyncStatus('local', 'Local');
+  closeSetupModal();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+(async function init() {
+  const hasSupa = initSupabase();
+  if (hasSupa) {
+    const loaded = await loadFromSupabase();
+    if (!loaded) { loadFromStorage(); setSyncStatus('error','Sin conexión'); }
+  } else {
+    setSyncStatus('local','💾 Local');
+  }
+  render();
+})();
 </script>
+
+<!-- SUPABASE SETUP MODAL -->
+<div class="overlay" id="setupOverlay">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <span class="modal-title">☁️ Conectar Supabase</span>
+      <button class="modal-close" onclick="closeSetupModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="setup-steps">
+        <div class="setup-step"><span class="step-num">1</span><span>Creá una cuenta gratuita en <strong>supabase.com</strong> → New Project</span></div>
+        <div class="setup-step"><span class="step-num">2</span><span>En el SQL Editor de tu proyecto, ejecutá este query:</span></div>
+        <div class="setup-sql">create table productos (
+  id bigserial primary key,
+  nombre text, categoria text, estado text,
+  proveedor text, web text,
+  mayor numeric, moq integer, ml numeric,
+  comision numeric, iva numeric, envio numeric, iibb numeric,
+  competencia text, anmat text, notas text,
+  created_at timestamptz default now()
+);
+alter table productos enable row level security;
+create policy "open" on productos for all using (true) with check (true);</div>
+        <div class="setup-step"><span class="step-num">3</span><span>Andá a <strong>Project Settings → API</strong> y copiá la <em>Project URL</em> y la <em>anon public key</em></span></div>
+      </div>
+
+      <div id="migrateBox" class="migrate-box" style="display:none">
+        <span>📦 Tenés productos locales. ¿Migramos a la nube?</span>
+        <label style="display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer">
+          <input type="checkbox" id="chkMigrate" checked> Migrar todo
+        </label>
+      </div>
+
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="form-group full">
+          <label>Project URL</label>
+          <input class="form-input" id="sUrl" placeholder="https://xxxxxxxxxxxx.supabase.co" autocomplete="off">
+        </div>
+        <div class="form-group full">
+          <label>Anon Key (public)</label>
+          <input class="form-input" id="sKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." autocomplete="off">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn-modal-cancel" onclick="disconnectSupabase()" style="color:#dc2626">Desconectar</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-modal-cancel" onclick="closeSetupModal()">Cancelar</button>
+        <button class="btn-modal-save" onclick="connectSupabase()">Conectar →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
