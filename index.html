@@ -140,6 +140,54 @@ textarea.form-input { resize: vertical; min-height: 56px; }
 .cost-toggle { font-size: 10px; color: #2563eb; cursor: pointer; text-decoration: underline; margin-top: 4px; display: inline-block; }
 .cost-breakdown { display: none; }
 .cost-breakdown.open { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+
+/* ── TABS ── */
+.tabs-nav { background: #fff; border-bottom: 1px solid #e4e4e7; padding: 0 24px; display: flex; gap: 0; }
+.tab-btn { padding: 13px 18px; font-size: 12px; font-weight: 600; color: #71717a; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+.tab-btn:hover { color: #18181b; }
+.tab-btn.active { color: #18181b; border-bottom-color: #30d158; }
+
+/* ── ROI PAGE ── */
+.roi-page { padding: 24px; max-width: 1100px; margin: 0 auto; }
+.roi-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+.roi-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); padding: 20px; }
+.roi-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #71717a; margin-bottom: 14px; }
+.roi-input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.roi-input-group label { font-size: 10px; font-weight: 700; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px; }
+.roi-input { border: 1px solid #e4e4e7; border-radius: 8px; padding: 9px 12px; font-size: 14px; font-weight: 600; color: #18181b; width: 100%; transition: border .15s; }
+.roi-input:focus { outline: none; border-color: #18181b; }
+.roi-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+.roi-seg-btn { padding: 8px 6px; border-radius: 8px; border: 1.5px solid #e4e4e7; background: #fff; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; transition: all .15s; color: #52525b; }
+.roi-seg-btn.active { border-color: #18181b; background: #18181b; color: #fff; }
+
+/* Waterfall */
+.waterfall { display: flex; flex-direction: column; gap: 8px; }
+.wf-row { display: flex; align-items: center; gap: 10px; }
+.wf-label { font-size: 11px; color: #52525b; width: 160px; flex-shrink: 0; }
+.wf-bar-wrap { flex: 1; background: #f4f4f5; border-radius: 4px; height: 22px; overflow: hidden; position: relative; }
+.wf-bar { height: 100%; border-radius: 4px; transition: width .4s ease; display: flex; align-items: center; padding: 0 8px; }
+.wf-bar span { font-size: 10px; font-weight: 700; color: #fff; white-space: nowrap; }
+.wf-amount { font-size: 11px; font-weight: 700; width: 90px; text-align: right; flex-shrink: 0; }
+.wf-divider { border: none; border-top: 1px dashed #e4e4e7; margin: 4px 0; }
+
+/* ROI metrics */
+.roi-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+.roi-metric { background: #f8f8f8; border-radius: 10px; padding: 12px 14px; }
+.roi-metric-val { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.roi-metric-label { font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+
+/* Comparison table */
+.comp-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+.comp-table th { background: #fafafa; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #71717a; padding: 9px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+.comp-table td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; font-size: 12px; }
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: #fafafa; }
+.best-col { background: #f0fdf4 !important; }
+.comp-val { font-weight: 700; }
+
+/* Tip box */
+.tip-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-top: 16px; font-size: 11.5px; color: #92400e; line-height: 1.6; }
+.tip-box strong { color: #78350f; }
 </style>
 </head>
 <body>
@@ -157,11 +205,18 @@ textarea.form-input { resize: vertical; min-height: 56px; }
     <button id="syncBadge" class="sync-badge local" onclick="openSetupModal()" title="Configurar base de datos Supabase">
       <span class="sync-dot"></span><span id="syncLabel">Local</span>
     </button>
-    <button class="btn btn-ghost" onclick="exportCSV()">⬇ CSV</button>
-    <button class="btn btn-ghost" onclick="saveSnapshot()" title="Descarga el archivo con todos tus datos adentro">💾 Copia</button>
     <button class="btn btn-primary" onclick="openModal()">+ Producto</button>
   </div>
 </div>
+
+<!-- TABS NAV -->
+<div class="tabs-nav">
+  <button class="tab-btn active" id="tabProductos" onclick="switchTab('productos')">📦 Productos</button>
+  <button class="tab-btn" id="tabROI" onclick="switchTab('roi')">📊 Calculadora ROI</button>
+</div>
+
+<!-- PAGE: PRODUCTOS -->
+<div id="pageProductos">
 
 <!-- STATS -->
 <div class="stats-bar" id="stats"></div>
@@ -219,6 +274,104 @@ textarea.form-input { resize: vertical; min-height: 56px; }
     <tbody id="tbody"></tbody>
   </table>
 </div>
+
+</div><!-- /pageProductos -->
+
+<!-- PAGE: ROI -->
+<div id="pageROI" style="display:none">
+<div class="roi-page">
+
+  <div class="roi-grid">
+
+    <!-- LEFT: Inputs -->
+    <div>
+      <div class="roi-card">
+        <div class="roi-card-title">🧮 Simulador de venta</div>
+
+        <div class="roi-input-group">
+          <label>Precio de venta en ML (ARS)</label>
+          <input class="roi-input" id="rPrecioML" type="number" placeholder="75000" value="75000" oninput="calcROI()">
+        </div>
+
+        <div class="roi-input-group">
+          <label>Costo mayorista por unidad (ARS)</label>
+          <input class="roi-input" id="rCosto" type="number" placeholder="30000" value="30000" oninput="calcROI()">
+        </div>
+
+        <div class="roi-input-group">
+          <label>Tipo de publicación ML</label>
+          <div class="roi-seg">
+            <button class="roi-seg-btn active" id="segPremium" onclick="setTipo('premium')">Premium<br><span style="font-weight:400;font-size:10px">17%</span></button>
+            <button class="roi-seg-btn" id="segClasica" onclick="setTipo('clasica')">Clásica<br><span style="font-weight:400;font-size:10px">13%</span></button>
+            <button class="roi-seg-btn" id="segGratis" onclick="setTipo('gratis')">Gratuita<br><span style="font-weight:400;font-size:10px">0%</span></button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="roi-input-group">
+            <label>Costo de envío (ARS)</label>
+            <input class="roi-input" id="rEnvio" type="number" value="4500" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <label>IIBB (%)</label>
+            <input class="roi-input" id="rIIBB" type="number" value="3" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <label>IVA sobre comisión (%)</label>
+            <input class="roi-input" id="rIVA" type="number" value="21" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <label>Unidades a vender</label>
+            <input class="roi-input" id="rUnidades" type="number" value="10" oninput="calcROI()">
+          </div>
+        </div>
+
+        <button onclick="calcROI()" style="margin-top:14px;width:100%;padding:12px;background:#18181b;color:#30d158;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:-0.3px">▶ Calcular ROI</button>
+      </div>
+
+      <div class="tip-box" style="margin-top:16px">
+        <strong>¿Qué tipo de publicación usar?</strong><br>
+        <strong>Premium (17%)</strong> — aparecés en los primeros resultados, incluye envío gratis para el comprador y cuotas sin interés. Obligatorio para escalar.<br>
+        <strong>Clásica (13%)</strong> — menor visibilidad, sin envío gratis automático. Sirve para testear antes de escalar.<br>
+        <strong>Gratuita (0%)</strong> — sin comisión pero con límite de unidades vendidas. Solo para arrancar.
+      </div>
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div>
+
+      <!-- Summary cards (Escalafy-style) -->
+      <div id="roiSummary" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px"></div>
+
+      <!-- Waterfall -->
+      <div class="roi-card">
+        <div class="roi-card-title">💸 Desglose de costos por venta</div>
+        <div class="waterfall" id="waterfallChart"></div>
+
+        <!-- Metrics -->
+        <div class="roi-metrics" id="roiMetrics"></div>
+      </div>
+
+      <!-- Comparison table -->
+      <div class="roi-card" style="margin-top:16px">
+        <div class="roi-card-title">⚖️ Comparativa: Premium vs Clásica vs Gratuita</div>
+        <table class="comp-table" id="compTable">
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Premium (17%)</th>
+              <th>Clásica (13%)</th>
+              <th>Gratuita (0%)</th>
+            </tr>
+          </thead>
+          <tbody id="compBody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div><!-- /pageROI -->
 
 <!-- MODAL -->
 <div class="overlay" id="overlay">
@@ -851,11 +1004,17 @@ document.getElementById('overlay').addEventListener('click', e => {
 // SUPABASE INTEGRATION
 // ────────────────────────────────────────────────────────────────
 const SUPA_CFG_KEY = 'fortis_supa_cfg';
+// Credenciales por defecto — cualquier dispositivo conecta automáticamente
+const SUPA_DEFAULT = {
+  url: 'https://wsqjkbzirdpxyphgvugm.supabase.co',
+  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndzcWprYnppcmRweHlwaGd2dWdtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTY4MjEsImV4cCI6MjA5ODMzMjgyMX0.qwd8vIaDkg0DwKljTSEhvN7HPGRsV6zA0VaIihRfPvg'
+};
 let supa = null;
 
 function initSupabase() {
   try {
-    const cfg = JSON.parse(localStorage.getItem(SUPA_CFG_KEY) || '{}');
+    const saved = JSON.parse(localStorage.getItem(SUPA_CFG_KEY) || '{}');
+    const cfg = (saved.url && saved.key) ? saved : SUPA_DEFAULT;
     if (cfg.url && cfg.key && window.supabase) {
       supa = window.supabase.createClient(cfg.url, cfg.key);
       return true;
@@ -966,6 +1125,178 @@ function disconnectSupabase() {
   supa = null;
   setSyncStatus('local', 'Local');
   closeSetupModal();
+}
+
+// ────────────────────────────────────────────────────────────────
+// TABS
+// ────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('pageProductos').style.display = tab === 'productos' ? '' : 'none';
+  document.getElementById('pageROI').style.display       = tab === 'roi'       ? '' : 'none';
+  document.getElementById('tabProductos').classList.toggle('active', tab === 'productos');
+  document.getElementById('tabROI').classList.toggle('active', tab === 'roi');
+  if (tab === 'roi') setTimeout(calcROI, 50);
+}
+
+// ────────────────────────────────────────────────────────────────
+// ROI CALCULATOR
+// ────────────────────────────────────────────────────────────────
+let roiTipo = 'premium'; // 'premium' | 'clasica' | 'gratis'
+const TIPO_COM = { premium: 17, clasica: 13, gratis: 0 };
+
+function setTipo(t) {
+  roiTipo = t;
+  ['premium','clasica','gratis'].forEach(x => {
+    document.getElementById('seg' + x.charAt(0).toUpperCase() + x.slice(1)).classList.toggle('active', x === t);
+  });
+  calcROI();
+}
+
+function calcROI() {
+  var precioML = parseFloat(document.getElementById('rPrecioML').value) || 0;
+  var costo    = parseFloat(document.getElementById('rCosto').value)    || 0;
+  var envio    = parseFloat(document.getElementById('rEnvio').value)    || 0;
+  var iibbPct  = parseFloat(document.getElementById('rIIBB').value)     || 0;
+  var ivaPct   = parseFloat(document.getElementById('rIVA').value)      || 0;
+  var unidades = parseInt(document.getElementById('rUnidades').value)   || 1;
+  var comPct   = TIPO_COM[roiTipo];
+
+  if (!precioML || precioML <= 0) {
+    var el = document.getElementById('rPrecioML');
+    el.style.border = '2px solid #dc2626';
+    el.style.animation = 'none';
+    el.focus();
+    setTimeout(function(){ el.style.border = ''; }, 1500);
+    document.getElementById('waterfallChart').innerHTML = '<p style="color:#dc2626;text-align:center;padding:16px;font-weight:600">Ingresa el Precio de Venta en ML para calcular.</p>';
+    return;
+  }
+
+  var comARS   = precioML * comPct / 100;
+  var ivaARS   = comARS * ivaPct / 100;
+  var iibbARS  = precioML * iibbPct / 100;
+  var neto     = precioML - comARS - ivaARS - envio - iibbARS;
+  var ganancia = neto - costo;
+  var margen   = costo > 0 ? (ganancia / costo) * 100 : 0;
+  var invTotal = costo * unidades;
+  var recupero = ganancia > 0 ? Math.ceil(invTotal / ganancia) : 0;
+  var roiTotal = invTotal > 0 ? ((ganancia * unidades) / invTotal) * 100 : 0;
+
+  var mCol = margen >= 30 ? '#16a34a' : margen >= 15 ? '#d97706' : '#dc2626';
+  var mBg  = margen >= 30 ? '#f0fdf4' : margen >= 15 ? '#fffbeb' : '#fef2f2';
+
+  function fmt(n) { return Math.round(n).toLocaleString('es-AR'); }
+  function pct(n) { return Math.min(100, Math.abs(n / precioML * 100)); }
+
+  // ── Waterfall ────────────────────────────────────────────────
+  var wfItems = [
+    { label: 'Precio ML (ingreso)', amount: precioML,  color: '#2563eb', p: 100 },
+    { label: 'Comision ML (' + comPct + '%)', amount: -comARS,   color: '#dc2626', p: pct(comARS) },
+    { label: 'IVA sobre comision (' + ivaPct + '%)', amount: -ivaARS,  color: '#ef4444', p: pct(ivaARS) },
+    { label: 'Costo de envio',       amount: -envio,    color: '#f97316', p: pct(envio) },
+    { label: 'IIBB (' + iibbPct + '%)',         amount: -iibbARS, color: '#fb923c', p: pct(iibbARS) },
+    { label: 'Costo mayorista',      amount: -costo,    color: '#7c3aed', p: pct(costo) },
+    { label: 'GANANCIA NETA / u.',   amount: ganancia,  color: mCol,      p: Math.max(0, pct(ganancia)) }
+  ];
+
+  var wfHTML = '';
+  for (var wi = 0; wi < wfItems.length; wi++) {
+    var item = wfItems[wi];
+    if (wi === wfItems.length - 1) wfHTML += '<hr class="wf-divider">';
+    var barW   = Math.min(100, item.p);
+    var sign   = item.amount < 0 ? '-' : '+';
+    var aColor = item.amount >= 0 ? (wi === 0 ? '#2563eb' : mCol) : '#dc2626';
+    var pctLbl = barW > 14 ? '<span>' + Math.round(item.p) + '%</span>' : '';
+    wfHTML += '<div class="wf-row">';
+    wfHTML += '<div class="wf-label">' + item.label + '</div>';
+    wfHTML += '<div class="wf-bar-wrap"><div class="wf-bar" style="width:' + barW + '%;background:' + item.color + '">' + pctLbl + '</div></div>';
+    wfHTML += '<div class="wf-amount" style="color:' + aColor + '">' + sign + '$' + fmt(Math.abs(item.amount)) + '</div>';
+    wfHTML += '</div>';
+  }
+  document.getElementById('waterfallChart').innerHTML = wfHTML;
+
+  // ── Summary cards (Escalafy-style) ───────────────────────────
+  var facturacion     = precioML * unidades;
+  var facturacionNeta = neto * unidades;
+  var gananciaTotal   = ganancia * unidades;
+  var gCol = gananciaTotal >= 0 ? '#30d158' : '#ff453a';
+  var sHTML = '';
+  sHTML += '<div style="background:#111;border:1px solid #27272a;border-radius:12px;padding:16px 18px">';
+  sHTML += '<div style="font-size:11px;color:#71717a;font-weight:600;letter-spacing:.5px;margin-bottom:6px">FACTURACIÓN</div>';
+  sHTML += '<div style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-.5px">$' + fmt(facturacion) + '</div>';
+  sHTML += '<div style="font-size:11px;color:#52525b;margin-top:4px">' + unidades + ' u. × $' + fmt(precioML) + '</div>';
+  sHTML += '</div>';
+  sHTML += '<div style="background:#111;border:1px solid #27272a;border-radius:12px;padding:16px 18px">';
+  sHTML += '<div style="font-size:11px;color:#71717a;font-weight:600;letter-spacing:.5px;margin-bottom:6px">FACTURACIÓN NETA</div>';
+  sHTML += '<div style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-.5px">$' + fmt(facturacionNeta) + '</div>';
+  sHTML += '<div style="font-size:11px;color:#52525b;margin-top:4px">sin comisión · IVA · IIBB · envío</div>';
+  sHTML += '</div>';
+  sHTML += '<div style="background:#111;border:1px solid #27272a;border-radius:12px;padding:16px 18px">';
+  sHTML += '<div style="font-size:11px;color:#71717a;font-weight:600;letter-spacing:.5px;margin-bottom:6px">GANANCIA</div>';
+  sHTML += '<div style="font-size:22px;font-weight:700;color:' + gCol + ';letter-spacing:-.5px">$' + fmt(gananciaTotal) + '</div>';
+  sHTML += '<div style="font-size:11px;color:#52525b;margin-top:4px">margen ' + margen.toFixed(1) + '% · ROI ' + roiTotal.toFixed(0) + '%</div>';
+  sHTML += '</div>';
+  document.getElementById('roiSummary').innerHTML = sHTML;
+
+  // ── Metrics ──────────────────────────────────────────────────
+  var recText = recupero > 0 ? recupero + ' u.' : 'infinito';
+  var mText   = margen.toFixed(1) + '%';
+  var mHTML   = '';
+  mHTML += '<div class="roi-metric" style="background:' + mBg + '">';
+  mHTML += '<div class="roi-metric-val" style="color:' + mCol + '">' + mText + '</div>';
+  mHTML += '<div class="roi-metric-label">Margen neto sobre costo</div></div>';
+  mHTML += '<div class="roi-metric">';
+  mHTML += '<div class="roi-metric-val" style="color:' + mCol + '">$' + fmt(ganancia) + '</div>';
+  mHTML += '<div class="roi-metric-label">Ganancia por unidad</div></div>';
+  mHTML += '<div class="roi-metric">';
+  mHTML += '<div class="roi-metric-val">$' + fmt(invTotal) + '</div>';
+  mHTML += '<div class="roi-metric-label">Inversion (' + unidades + ' u.)</div></div>';
+  mHTML += '<div class="roi-metric">';
+  mHTML += '<div class="roi-metric-val" style="color:' + mCol + '">' + recText + '</div>';
+  mHTML += '<div class="roi-metric-label">Unidades para recuperar inversion</div></div>';
+  mHTML += '<div class="roi-metric" style="grid-column:1/-1;background:#18181b">';
+  mHTML += '<div class="roi-metric-val" style="color:#30d158">$' + fmt(ganancia * unidades) + '</div>';
+  mHTML += '<div class="roi-metric-label" style="color:#71717a">Ganancia total ' + unidades + ' unidades &nbsp;·&nbsp; ROI ' + roiTotal.toFixed(0) + '%</div></div>';
+  document.getElementById('roiMetrics').innerHTML = mHTML;
+
+  // ── Comparison table ─────────────────────────────────────────
+  var tipos = [
+    { com: 17, lbl: 'Premium' },
+    { com: 13, lbl: 'Clasica' },
+    { com: 0,  lbl: 'Gratuita' }
+  ];
+  var calcs = [];
+  for (var ti = 0; ti < tipos.length; ti++) {
+    var t  = tipos[ti];
+    var c  = precioML * t.com / 100;
+    var iv = c * ivaPct / 100;
+    var ii = precioML * iibbPct / 100;
+    var g  = precioML - c - iv - envio - ii - costo;
+    var mg = costo > 0 ? (g / costo) * 100 : 0;
+    calcs.push({ com: t.com, lbl: t.lbl, comARS: c, ivaARS: iv, iibbARS: ii, gan: g, mg: mg });
+  }
+  var bestIdx = 0;
+  for (var ci = 1; ci < calcs.length; ci++) { if (calcs[ci].gan > calcs[bestIdx].gan) bestIdx = ci; }
+
+  var rowDefs = [
+    { lbl: 'Comision ML',        fn: function(x){ return '$' + fmt(x.comARS) + ' (' + x.com + '%)'; } },
+    { lbl: 'IVA sobre comision', fn: function(x){ return '$' + fmt(x.ivaARS); } },
+    { lbl: 'Costo envio',        fn: function(x){ return '$' + fmt(envio); } },
+    { lbl: 'IIBB',               fn: function(x){ return '$' + fmt(x.iibbARS); } },
+    { lbl: 'Costo mayorista',    fn: function(x){ return '$' + fmt(costo); } },
+    { lbl: 'Ganancia / u.',      fn: function(x){ var gc = x.mg >= 30 ? '#16a34a' : x.mg >= 15 ? '#d97706' : '#dc2626'; return '<strong style="color:' + gc + '">$' + fmt(x.gan) + '</strong>'; } },
+    { lbl: 'Margen sobre costo', fn: function(x){ var gc = x.mg >= 30 ? '#16a34a' : x.mg >= 15 ? '#d97706' : '#dc2626'; return '<strong style="color:' + gc + '">' + x.mg.toFixed(1) + '%</strong>'; } }
+  ];
+
+  var tHTML = '';
+  for (var ri = 0; ri < rowDefs.length; ri++) {
+    tHTML += '<tr><td style="color:#52525b;font-size:11px">' + rowDefs[ri].lbl + '</td>';
+    for (var ci2 = 0; ci2 < calcs.length; ci2++) {
+      var cls = ci2 === bestIdx ? ' class="best-col"' : '';
+      tHTML += '<td' + cls + '>' + rowDefs[ri].fn(calcs[ci2]) + '</td>';
+    }
+    tHTML += '</tr>';
+  }
+  document.getElementById('compBody').innerHTML = tHTML;
 }
 
 // ── INIT ─────────────────────────────────────────────────────────
