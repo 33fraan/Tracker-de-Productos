@@ -188,6 +188,89 @@ textarea.form-input { resize: vertical; min-height: 56px; }
 /* Tip box */
 .tip-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-top: 16px; font-size: 11.5px; color: #92400e; line-height: 1.6; }
 .tip-box strong { color: #78350f; }
+
+/* ── CONTABILIDAD PAGE ── */
+.contab-page { padding: 24px; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.contab-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.contab-title { font-size: 18px; font-weight: 800; letter-spacing: -0.4px; }
+.source-btns { display: flex; gap: 4px; }
+.src-btn { padding: 6px 14px; border-radius: 8px; border: 1.5px solid #e4e4e7; background: #fff; font-size: 12px; font-weight: 600; cursor: pointer; color: #52525b; transition: all .15s; }
+.src-btn.active { border-color: #18181b; background: #18181b; color: #fff; }
+.contab-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.cs-card { background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,.06); border-left: 4px solid #e4e4e7; }
+.cs-card.bruta { border-left-color: #2563eb; }
+.cs-card.neta { border-left-color: #7c3aed; }
+.cs-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #71717a; margin-bottom: 6px; }
+.cs-input { font-size: 24px; font-weight: 900; letter-spacing: -0.8px; border: none; background: transparent; width: 100%; outline: none; padding: 0; color: inherit; font-family: inherit; }
+.cs-input.bruta-color { color: #2563eb; }
+.cs-input.neta-color { color: #7c3aed; }
+.cs-input::placeholder { color: #d4d4d8; font-weight: 700; }
+.cs-sub { font-size: 10px; color: #71717a; margin-top: 4px; }
+.periodo-pill { background:#fff; color:#18181b; border:2px solid #18181b; border-radius:20px; padding:6px 16px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; user-select:none; transition:opacity .15s; }
+.periodo-pill:hover { opacity:0.8; }
+.periodo-picker { position:absolute; right:0; top:calc(100% + 8px); background:#fff; border-radius:14px; padding:16px; box-shadow:0 8px 32px rgba(0,0,0,.14); border:1px solid #e4e4e7; z-index:200; display:none; width:272px; }
+.periodo-picker.open { display:block; }
+.cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.cal-nav-btn { background:#f4f4f5; border:none; border-radius:8px; width:28px; height:28px; cursor:pointer; font-size:16px; font-weight:700; color:#18181b; display:flex; align-items:center; justify-content:center; line-height:1; }
+.cal-nav-btn:hover { background:#e4e4e7; }
+.cal-month-label { font-size:14px; font-weight:700; color:#18181b; }
+.cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:10px; font-weight:700; color:#a1a1aa; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:6px; gap:2px; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.cal-day { text-align:center; padding:5px 0; font-size:12px; font-weight:500; color:#18181b; cursor:pointer; border-radius:7px; transition:background .1s; }
+.cal-day:hover { background:#f4f4f5; }
+.cal-day-empty { }
+.cal-in-range { background:#f0f0f0; border-radius:0; }
+.cal-selected { background:#18181b !important; color:#fff !important; font-weight:700; border-radius:7px; }
+.cal-desde.cal-in-range { border-radius:7px 0 0 7px; }
+.cal-hasta.cal-in-range { border-radius:0 7px 7px 0; }
+.gasto-mini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 6px; }
+.gasto-mini-card { background: #fafafa; border: 1px solid #e4e4e7; border-radius: 10px; padding: 10px 12px; position: relative; }
+.gasto-mini-card.custom { border-style: dashed; }
+.gasto-mini-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #71717a; margin-bottom: 5px; }
+.gasto-mini-input { border: none; background: transparent; font-size: 15px; font-weight: 700; color: #18181b; width: 100%; outline: none; padding: 0; }
+.gasto-mini-input::placeholder { color: #d4d4d8; }
+.gasto-mini-del { position: absolute; top: 6px; right: 7px; background: none; border: none; cursor: pointer; color: #a1a1aa; font-size: 13px; line-height: 1; padding: 0; }
+.gasto-mini-del:hover { color: #dc2626; }
+.add-mini-btn { background: none; border: 1.5px dashed #e4e4e7; border-radius: 10px; padding: 10px 12px; font-size: 11px; font-weight: 600; color: #a1a1aa; cursor: pointer; width: 100%; text-align: left; transition: all .15s; }
+.add-mini-btn:hover { border-color: #18181b; color: #18181b; }
+.contab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.contab-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.contab-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #71717a; margin-bottom: 16px; }
+.gastos-cats { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.gasto-row { display: flex; align-items: center; gap: 10px; }
+.gasto-label { font-size: 12px; font-weight: 600; color: #18181b; min-width: 125px; }
+.gasto-input { border: 1px solid #e4e4e7; border-radius: 8px; padding: 7px 10px; font-size: 13px; font-weight: 600; color: #18181b; flex: 1; transition: border .15s; }
+.gasto-input:focus { outline: none; border-color: #18181b; }
+.gastos-custom { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.custom-gasto-row { display: flex; align-items: center; gap: 8px; }
+.custom-gasto-name { border: 1px solid #e4e4e7; border-radius: 8px; padding: 7px 10px; font-size: 12px; color: #18181b; flex: 1.5; }
+.custom-gasto-name:focus { outline: none; border-color: #18181b; }
+.custom-gasto-monto { border: 1px solid #e4e4e7; border-radius: 8px; padding: 7px 10px; font-size: 13px; font-weight: 600; color: #18181b; flex: 1; }
+.custom-gasto-monto:focus { outline: none; border-color: #18181b; }
+.del-gasto-btn { background: #fef2f2; color: #b91c1c; border: none; border-radius: 6px; width: 26px; height: 26px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.del-gasto-btn:hover { background: #fee2e2; }
+.add-gasto-btn { background: none; border: 1.5px dashed #e4e4e7; border-radius: 8px; padding: 8px; width: 100%; font-size: 12px; font-weight: 600; color: #71717a; cursor: pointer; margin: 8px 0; transition: all .15s; }
+.add-gasto-btn:hover { border-color: #18181b; color: #18181b; }
+.gastos-total { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: #fef2f2; border-radius: 10px; margin-top: 8px; font-size: 13px; font-weight: 600; }
+.dist-item { margin-bottom: 16px; }
+.dist-item:last-child { margin-bottom: 0; }
+.dist-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.dist-label { font-size: 13px; font-weight: 700; color: #18181b; }
+.dist-type-toggle { display: flex; gap: 3px; }
+.dtype-btn { padding: 3px 10px; border-radius: 6px; border: 1.5px solid #e4e4e7; background: #fff; font-size: 11px; font-weight: 700; cursor: pointer; color: #52525b; transition: all .15s; }
+.dtype-btn.active { border-color: #18181b; background: #18181b; color: #fff; }
+.dist-input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.dist-input { border: 1px solid #e4e4e7; border-radius: 8px; padding: 7px 10px; font-size: 14px; font-weight: 700; color: #18181b; width: 90px; }
+.dist-input:focus { outline: none; border-color: #18181b; }
+.dist-result { font-size: 16px; font-weight: 800; color: #18181b; letter-spacing: -0.4px; flex: 1; text-align: right; }
+.dist-bar-wrap { height: 8px; background: #f4f4f5; border-radius: 4px; overflow: hidden; }
+.dist-bar { height: 100%; border-radius: 4px; transition: width .4s ease; }
+.restock-table { width: 100%; border-collapse: collapse; }
+.restock-table th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #71717a; padding: 8px 12px; text-align: left; background: #fafafa; border-bottom: 1px solid #f0f0f0; }
+.restock-table td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; font-size: 12px; vertical-align: middle; }
+.restock-table tr:last-child td { border-bottom: none; }
+.restock-alcanza { background: #f0fdf4; color: #15803d; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px; display: inline-block; }
+.restock-notalcanza { background: #fef2f2; color: #b91c1c; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 20px; display: inline-block; }
 </style>
 </head>
 <body>
@@ -205,7 +288,7 @@ textarea.form-input { resize: vertical; min-height: 56px; }
     <button id="syncBadge" class="sync-badge local" onclick="openSetupModal()" title="Configurar base de datos Supabase">
       <span class="sync-dot"></span><span id="syncLabel">Local</span>
     </button>
-    <button class="btn btn-primary" onclick="openModal()">+ Producto</button>
+    <button id="btnAddProducto" class="btn btn-primary" onclick="openModal()">+ Producto</button>
   </div>
 </div>
 
@@ -213,6 +296,7 @@ textarea.form-input { resize: vertical; min-height: 56px; }
 <div class="tabs-nav">
   <button class="tab-btn active" id="tabProductos" onclick="switchTab('productos')">📦 Productos</button>
   <button class="tab-btn" id="tabROI" onclick="switchTab('roi')">📊 Calculadora ROI</button>
+  <button class="tab-btn" id="tabContab" onclick="switchTab('contab')">💰 Contabilidad</button>
 </div>
 
 <!-- PAGE: PRODUCTOS -->
@@ -281,6 +365,9 @@ textarea.form-input { resize: vertical; min-height: 56px; }
 <div id="pageROI" style="display:none">
 <div class="roi-page">
 
+  <!-- Summary cards — full width at top -->
+  <div id="roiSummary" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px"></div>
+
   <div class="roi-grid">
 
     <!-- LEFT: Inputs -->
@@ -288,29 +375,22 @@ textarea.form-input { resize: vertical; min-height: 56px; }
       <div class="roi-card">
         <div class="roi-card-title">🧮 Simulador de venta</div>
 
-        <div class="roi-input-group">
-          <label>Precio de venta en ML (ARS)</label>
-          <input class="roi-input" id="rPrecioML" type="number" placeholder="75000" value="75000" oninput="calcROI()">
-        </div>
-
-        <div class="roi-input-group">
-          <label>Costo mayorista por unidad (ARS)</label>
-          <input class="roi-input" id="rCosto" type="number" placeholder="30000" value="30000" oninput="calcROI()">
-        </div>
-
-        <div class="roi-input-group">
-          <label>Tipo de publicación ML</label>
-          <div class="roi-seg">
-            <button class="roi-seg-btn active" id="segPremium" onclick="setTipo('premium')">Premium<br><span style="font-weight:400;font-size:10px">17%</span></button>
-            <button class="roi-seg-btn" id="segClasica" onclick="setTipo('clasica')">Clásica<br><span style="font-weight:400;font-size:10px">13%</span></button>
-            <button class="roi-seg-btn" id="segGratis" onclick="setTipo('gratis')">Gratuita<br><span style="font-weight:400;font-size:10px">0%</span></button>
-          </div>
-        </div>
-
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="roi-input-group" style="grid-column:1/-1">
+            <label>Precio de venta en ML (ARS)</label>
+            <input class="roi-input" id="rPrecioML" type="number" placeholder="75000" value="75000" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group" style="grid-column:1/-1">
+            <label>Costo mayorista por unidad (ARS)</label>
+            <input class="roi-input" id="rCosto" type="number" placeholder="30000" value="30000" oninput="calcROI()">
+          </div>
           <div class="roi-input-group">
             <label>Costo de envío (ARS)</label>
             <input class="roi-input" id="rEnvio" type="number" value="4500" oninput="calcROI()">
+          </div>
+          <div class="roi-input-group">
+            <label>Unidades a vender</label>
+            <input class="roi-input" id="rUnidades" type="number" value="10" oninput="calcROI()">
           </div>
           <div class="roi-input-group">
             <label>IIBB (%)</label>
@@ -320,57 +400,202 @@ textarea.form-input { resize: vertical; min-height: 56px; }
             <label>IVA sobre comisión (%)</label>
             <input class="roi-input" id="rIVA" type="number" value="21" oninput="calcROI()">
           </div>
-          <div class="roi-input-group">
-            <label>Unidades a vender</label>
-            <input class="roi-input" id="rUnidades" type="number" value="10" oninput="calcROI()">
-          </div>
         </div>
 
+        <div class="roi-input-group" style="margin-top:10px">
+          <label>Tipo de publicación ML</label>
+          <div class="roi-seg">
+            <button class="roi-seg-btn active" id="segPremium" onclick="setTipo('premium')">Premium<br><span style="font-weight:400;font-size:10px">17%</span></button>
+            <button class="roi-seg-btn" id="segClasica" onclick="setTipo('clasica')">Clásica<br><span style="font-weight:400;font-size:10px">13%</span></button>
+          </div>
+        </div>
       </div>
 
       <div class="tip-box" style="margin-top:16px">
         <strong>¿Qué tipo de publicación usar?</strong><br>
         <strong>Premium (17%)</strong> — aparecés en los primeros resultados, incluye envío gratis para el comprador y cuotas sin interés. Obligatorio para escalar.<br>
-        <strong>Clásica (13%)</strong> — menor visibilidad, sin envío gratis automático. Sirve para testear antes de escalar.<br>
-        <strong>Gratuita (0%)</strong> — sin comisión pero con límite de unidades vendidas. Solo para arrancar.
+        <strong>Clásica (13%)</strong> — menor visibilidad, sin envío gratis automático. Sirve para testear antes de escalar.
       </div>
     </div>
 
     <!-- RIGHT: Results -->
     <div>
-
-      <!-- Summary cards (Escalafy-style) -->
-      <div id="roiSummary" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px"></div>
-
       <!-- Waterfall -->
       <div class="roi-card">
         <div class="roi-card-title">💸 Desglose de costos por venta</div>
         <div class="waterfall" id="waterfallChart"></div>
-
-        <!-- Metrics -->
         <div class="roi-metrics" id="roiMetrics"></div>
       </div>
 
-      <!-- Comparison table -->
+      <!-- Comparison table: Premium vs Clásica -->
       <div class="roi-card" style="margin-top:16px">
-        <div class="roi-card-title">⚖️ Comparativa: Premium vs Clásica vs Gratuita</div>
+        <div class="roi-card-title">⚖️ Comparativa: Premium vs Clásica</div>
         <table class="comp-table" id="compTable">
           <thead>
             <tr>
               <th>Concepto</th>
               <th>Premium (17%)</th>
               <th>Clásica (13%)</th>
-              <th>Gratuita (0%)</th>
             </tr>
           </thead>
           <tbody id="compBody"></tbody>
         </table>
       </div>
-
     </div>
   </div>
 </div>
 </div><!-- /pageROI -->
+
+<!-- PAGE: CONTABILIDAD -->
+<div id="pageContab" style="display:none">
+<div class="contab-page">
+
+  <!-- Header -->
+  <div class="contab-header">
+    <div class="contab-title">💰 Gestor de Contabilidad</div>
+    <div style="position:relative">
+      <div class="periodo-pill" onclick="togglePeriodoPicker(event)">
+        <span id="periodoLabel">Seleccionar período</span>
+      </div>
+      <div class="periodo-picker" id="periodoPicker" onclick="event.stopPropagation()">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calPrevMonth(event)">‹</button>
+          <span class="cal-month-label" id="calMonthLabel"></span>
+          <button class="cal-nav-btn" onclick="calNextMonth(event)">›</button>
+        </div>
+        <div class="cal-weekdays">
+          <span>lu</span><span>ma</span><span>mi</span><span>ju</span><span>vi</span><span>sá</span><span>do</span>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div style="margin-top:10px;font-size:10px;color:#a1a1aa;text-align:center">Clic en inicio → fin del período</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Cards: Bruta + Neta (editables) -->
+  <div class="contab-summary">
+    <div class="cs-card bruta">
+      <div class="cs-label">💰 Facturación Bruta</div>
+      <input class="cs-input bruta-color" id="cManualBruta" type="text" placeholder="$0"
+        onfocus="this.value=unformatContabVal(this.value)||''"
+        onblur="this.value=this.value?formatContabVal(this.value):''; saveManual(); renderContab()"
+        oninput="renderContab()">
+      <div class="cs-sub">Ingreso bruto del mes</div>
+    </div>
+    <div class="cs-card neta">
+      <div class="cs-label">📊 Facturación Neta</div>
+      <input class="cs-input neta-color" id="cManualNeta" type="text" placeholder="$0"
+        onfocus="this.value=unformatContabVal(this.value)||''"
+        onblur="this.value=this.value?formatContabVal(this.value):''; saveManual(); renderContab()"
+        oninput="renderContab()">
+      <div class="cs-sub">Después de comisiones ML, IVA e IIBB</div>
+    </div>
+  </div>
+
+  <!-- Distribución full-width -->
+  <div class="contab-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="contab-card-title" style="margin-bottom:0">🎯 Distribución de la Facturación Neta</div>
+      <div id="netaDistLabel" style="font-size:22px;font-weight:900;color:#18181b;letter-spacing:-0.8px">$0</div>
+    </div>
+
+    <!-- Gastos operativos como mini-cards -->
+    <div class="dist-item">
+      <div class="dist-item-header">
+        <span class="dist-label">📋 Gastos operativos</span>
+        <span class="dist-result" id="dGastosResult" style="color:#dc2626;font-size:14px">$0</span>
+      </div>
+      <div class="dist-bar-wrap"><div class="dist-bar" id="dGastosBar" style="background:#dc2626;width:0%"></div></div>
+
+      <div class="gasto-mini-grid" id="gastoMiniGrid">
+        <div class="gasto-mini-card">
+          <div class="gasto-mini-label">📦 Packaging</div>
+          <input class="gasto-mini-input" id="gPackaging" type="text" placeholder="0"
+            onfocus="this.value=unformatContabVal(this.value)||''"
+            onblur="this.value=this.value?Number(unformatContabVal(this.value)).toLocaleString('es-AR'):''; saveGastos(); renderContab()"
+            oninput="saveGastos(); renderContab()">
+        </div>
+        <div class="gasto-mini-card">
+          <div class="gasto-mini-label">🚚 Envíos</div>
+          <input class="gasto-mini-input" id="gEnvios" type="text" placeholder="0"
+            onfocus="this.value=unformatContabVal(this.value)||''"
+            onblur="this.value=this.value?Number(unformatContabVal(this.value)).toLocaleString('es-AR'):''; saveGastos(); renderContab()"
+            oninput="saveGastos(); renderContab()">
+        </div>
+        <div class="gasto-mini-card">
+          <div class="gasto-mini-label">🧾 Impuestos</div>
+          <input class="gasto-mini-input" id="gImpuestos" type="text" placeholder="0"
+            onfocus="this.value=unformatContabVal(this.value)||''"
+            onblur="this.value=this.value?Number(unformatContabVal(this.value)).toLocaleString('es-AR'):''; saveGastos(); renderContab()"
+            oninput="saveGastos(); renderContab()">
+        </div>
+        <div class="gasto-mini-card">
+          <div class="gasto-mini-label">📣 Anuncios</div>
+          <input class="gasto-mini-input" id="gAnuncios" type="text" placeholder="0"
+            onfocus="this.value=unformatContabVal(this.value)||''"
+            onblur="this.value=this.value?Number(unformatContabVal(this.value)).toLocaleString('es-AR'):''; saveGastos(); renderContab()"
+            oninput="saveGastos(); renderContab()">
+        </div>
+      </div>
+    </div>
+
+    <div style="border-top:1px dashed #e4e4e7;margin:4px 0 16px"></div>
+    <div style="font-size:10px;color:#71717a;text-transform:uppercase;letter-spacing:0.4px;font-weight:700;margin-bottom:12px">Disponible para repartir: <span id="disponibleMonto" style="color:#18181b">$0</span></div>
+
+    <!-- Restock -->
+    <div class="dist-item">
+      <div class="dist-item-header">
+        <span class="dist-label">🔄 Stock</span>
+        <div class="dist-type-toggle">
+          <button class="dtype-btn active" id="dtRestockPct" onclick="setDistType('restock','pct')">%</button>
+          <button class="dtype-btn" id="dtRestockFijo" onclick="setDistType('restock','fijo')">$ fijo</button>
+        </div>
+      </div>
+      <div class="dist-input-row">
+        <input class="dist-input" id="dRestockVal" type="number" value="40" min="0" oninput="saveStrategy(); renderContab()">
+        <span style="font-size:11px;color:#71717a" id="dRestockUnit">%</span>
+        <span class="dist-result" id="dRestockResult" style="color:#2563eb">$0</span>
+      </div>
+      <div class="dist-bar-wrap"><div class="dist-bar" id="dRestockBar" style="background:#2563eb;width:0%"></div></div>
+    </div>
+
+    <!-- Sueldo -->
+    <div class="dist-item">
+      <div class="dist-item-header">
+        <span class="dist-label">👤 Sueldo</span>
+        <div class="dist-type-toggle">
+          <button class="dtype-btn active" id="dtSueldoPct" onclick="setDistType('sueldo','pct')">%</button>
+          <button class="dtype-btn" id="dtSueldoFijo" onclick="setDistType('sueldo','fijo')">$ fijo</button>
+        </div>
+      </div>
+      <div class="dist-input-row">
+        <input class="dist-input" id="dSueldoVal" type="number" value="30" min="0" oninput="saveStrategy(); renderContab()">
+        <span style="font-size:11px;color:#71717a" id="dSueldoUnit">%</span>
+        <span class="dist-result" id="dSueldoResult" style="color:#7c3aed">$0</span>
+      </div>
+      <div class="dist-bar-wrap"><div class="dist-bar" id="dSueldoBar" style="background:#7c3aed;width:0%"></div></div>
+    </div>
+
+    <!-- Reserva -->
+    <div class="dist-item">
+      <div class="dist-item-header">
+        <span class="dist-label">🏦 Reserva / Caja</span>
+        <div class="dist-type-toggle">
+          <button class="dtype-btn active" id="dtReservaPct" onclick="setDistType('reserva','pct')">%</button>
+          <button class="dtype-btn" id="dtReservaFijo" onclick="setDistType('reserva','fijo')">$ fijo</button>
+        </div>
+      </div>
+      <div class="dist-input-row">
+        <input class="dist-input" id="dReservaVal" type="number" value="30" min="0" oninput="saveStrategy(); renderContab()">
+        <span style="font-size:11px;color:#71717a" id="dReservaUnit">%</span>
+        <span class="dist-result" id="dReservaResult" style="color:#16a34a">$0</span>
+      </div>
+      <div class="dist-bar-wrap"><div class="dist-bar" id="dReservaBar" style="background:#16a34a;width:0%"></div></div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /pageContab -->
 
 <!-- MODAL -->
 <div class="overlay" id="overlay">
@@ -444,7 +669,6 @@ textarea.form-input { resize: vertical; min-height: 56px; }
           <select class="form-input" id="fTipoML" onchange="syncComision(); calcPreview()">
             <option value="17">Premium (17%)</option>
             <option value="13">Clásica (13%)</option>
-            <option value="0">Gratuita (0%)</option>
           </select>
         </div>
 
@@ -1132,46 +1356,55 @@ function disconnectSupabase() {
 function switchTab(tab) {
   document.getElementById('pageProductos').style.display = tab === 'productos' ? '' : 'none';
   document.getElementById('pageROI').style.display       = tab === 'roi'       ? '' : 'none';
+  document.getElementById('pageContab').style.display    = tab === 'contab'    ? '' : 'none';
   document.getElementById('tabProductos').classList.toggle('active', tab === 'productos');
   document.getElementById('tabROI').classList.toggle('active', tab === 'roi');
+  document.getElementById('tabContab').classList.toggle('active', tab === 'contab');
+  document.getElementById('btnAddProducto').style.display = tab === 'productos' ? '' : 'none';
   if (tab === 'roi') setTimeout(calcROI, 50);
+  if (tab === 'contab') setTimeout(function(){ loadManual(); loadPeriodo(); loadGastos(); loadStrategy(); renderContab(); }, 50);
 }
 
 // ────────────────────────────────────────────────────────────────
 // ROI CALCULATOR
 // ────────────────────────────────────────────────────────────────
-let roiTipo = 'premium'; // 'premium' | 'clasica' | 'gratis'
-const TIPO_COM = { premium: 17, clasica: 13, gratis: 0 };
+let roiTipo = 'premium'; // 'premium' | 'clasica'
+const TIPO_COM = { premium: 17, clasica: 13 };
 
 function setTipo(t) {
   roiTipo = t;
-  ['premium','clasica','gratis'].forEach(x => {
+  ['premium','clasica'].forEach(x => {
     document.getElementById('seg' + x.charAt(0).toUpperCase() + x.slice(1)).classList.toggle('active', x === t);
   });
   calcROI();
 }
 
 function calcROI() {
-  var precioML = parseFloat(document.getElementById('rPrecioML').value) || 0;
-  var costo    = parseFloat(document.getElementById('rCosto').value)    || 0;
-  var envio    = parseFloat(document.getElementById('rEnvio').value)    || 0;
-  var iibbPct  = parseFloat(document.getElementById('rIIBB').value)     || 0;
-  var ivaPct   = parseFloat(document.getElementById('rIVA').value)      || 0;
-  var unidades = parseInt(document.getElementById('rUnidades').value)   || 1;
-  var comPct   = TIPO_COM[roiTipo];
+  // Lectura defensiva — nunca NaN
+  var precioML = Math.max(0, parseFloat(document.getElementById('rPrecioML').value) || 0);
+  var costo    = Math.max(0, parseFloat(document.getElementById('rCosto').value)    || 0);
+  var envio    = Math.max(0, parseFloat(document.getElementById('rEnvio').value)    || 0);
+  var iibbPct  = Math.max(0, parseFloat(document.getElementById('rIIBB').value)     || 0);
+  var ivaPct   = Math.max(0, parseFloat(document.getElementById('rIVA').value)      || 0);
+  var unidades = Math.max(1, parseInt(document.getElementById('rUnidades').value)   || 1);
+  var comPct   = TIPO_COM[roiTipo] || 0;
 
-  if (!precioML || precioML <= 0) {
-    var el = document.getElementById('rPrecioML');
-    el.style.border = '2px solid #dc2626';
-    el.style.animation = 'none';
-    el.focus();
-    setTimeout(function(){ el.style.border = ''; }, 1500);
-    document.getElementById('waterfallChart').innerHTML = '<p style="color:#dc2626;text-align:center;padding:16px;font-weight:600">Ingresa el Precio de Venta en ML para calcular.</p>';
+  if (precioML <= 0) {
+    document.getElementById('waterfallChart').innerHTML = '<p style="color:#a1a1aa;text-align:center;padding:20px;font-size:13px">Ingresá el precio de venta en ML para calcular.</p>';
+    document.getElementById('roiSummary').innerHTML = '';
+    document.getElementById('roiMetrics').innerHTML = '';
+    document.getElementById('compBody').innerHTML = '';
     return;
   }
 
+  // Fórmula ML Argentina:
+  // comARS  = precio × comisión%          (comisión de ML sobre el precio)
+  // ivaARS  = comARS × IVA%              (IVA aplicado SOBRE la comisión, no sobre el precio)
+  // iibbARS = precio × IIBB%             (impuesto de ingresos brutos sobre el precio)
+  // neto    = precio − comARS − ivaARS − envio − iibbARS
+  // ganancia = neto − costo mayorista
   var comARS   = precioML * comPct / 100;
-  var ivaARS   = comARS * ivaPct / 100;
+  var ivaARS   = comARS   * ivaPct / 100;
   var iibbARS  = precioML * iibbPct / 100;
   var neto     = precioML - comARS - ivaARS - envio - iibbARS;
   var ganancia = neto - costo;
@@ -1260,8 +1493,7 @@ function calcROI() {
   // ── Comparison table ─────────────────────────────────────────
   var tipos = [
     { com: 17, lbl: 'Premium' },
-    { com: 13, lbl: 'Clasica' },
-    { com: 0,  lbl: 'Gratuita' }
+    { com: 13, lbl: 'Clasica' }
   ];
   var calcs = [];
   for (var ti = 0; ti < tipos.length; ti++) {
@@ -1309,6 +1541,346 @@ function calcROI() {
   }
   render();
 })();
+
+// ────────────────────────────────────────────────────────────────
+// CONTABILIDAD
+// ────────────────────────────────────────────────────────────────
+var distTypes = { restock: 'pct', sueldo: 'pct', reserva: 'pct' };
+var customGastos = [];
+var customGastoId = 1;
+
+function unformatContabVal(str) {
+  return parseFloat(String(str).replace(/\$/g,'').replace(/\./g,'').replace(',','.')) || 0;
+}
+function formatContabVal(raw) {
+  var n = unformatContabVal(raw);
+  return n > 0 ? '$' + n.toLocaleString('es-AR') : '';
+}
+
+// ── CUSTOM CALENDAR ──────────────────────────────────────────────
+var calDesde  = null; // Date object
+var calHasta  = null; // Date object
+var calYear   = new Date().getFullYear();
+var calMonth  = new Date().getMonth();
+var calStep   = 1;   // 1=picking desde, 2=picking hasta
+var MESES_ES  = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function fmtCalDate(d) {
+  if (!d) return '';
+  return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+}
+
+function updatePeriodoLabel() {
+  var lbl = document.getElementById('periodoLabel');
+  if (!lbl) return;
+  if (calDesde && calHasta) lbl.textContent = fmtCalDate(calDesde) + ' - ' + fmtCalDate(calHasta);
+  else if (calDesde)        lbl.textContent = fmtCalDate(calDesde) + ' - ...';
+  else                      lbl.textContent = 'Seleccionar período';
+}
+
+function renderCalGrid() {
+  var lbl = document.getElementById('calMonthLabel');
+  if (lbl) lbl.textContent = MESES_ES[calMonth] + ' ' + calYear;
+  var grid = document.getElementById('calGrid');
+  if (!grid) return;
+  var firstDay = (new Date(calYear, calMonth, 1).getDay() + 6) % 7; // Mon=0
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var html = '';
+  for (var i = 0; i < firstDay; i++) html += '<div class="cal-day cal-day-empty"></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dt = new Date(calYear, calMonth, d);
+    var isD = calDesde && dt.toDateString() === calDesde.toDateString();
+    var isH = calHasta && dt.toDateString() === calHasta.toDateString();
+    var inR = calDesde && calHasta && dt > calDesde && dt < calHasta;
+    var cls = 'cal-day';
+    if (isD || isH) cls += ' cal-selected';
+    if (inR)        cls += ' cal-in-range';
+    if (isD && inR) cls += ' cal-desde';
+    if (isH && inR) cls += ' cal-hasta';
+    var ds = calYear + '-' + String(calMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    html += '<div class="' + cls + '" onclick="calPickDay(\'' + ds + '\')">' + d + '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function calPickDay(ds) {
+  var dt = new Date(ds + 'T00:00:00');
+  if (calStep === 1 || (calDesde && calHasta)) {
+    calDesde = dt; calHasta = null; calStep = 2;
+  } else {
+    if (dt < calDesde) { calHasta = calDesde; calDesde = dt; }
+    else               { calHasta = dt; }
+    calStep = 1;
+  }
+  updatePeriodoLabel(); savePeriodo(); renderCalGrid();
+}
+
+function calPrevMonth(e) { if (e) e.stopPropagation(); calMonth--; if (calMonth < 0) { calMonth=11; calYear--; } renderCalGrid(); }
+function calNextMonth(e) { if (e) e.stopPropagation(); calMonth++; if (calMonth > 11) { calMonth=0; calYear++; } renderCalGrid(); }
+
+function togglePeriodoPicker(e) {
+  if (e) e.stopPropagation();
+  var picker = document.getElementById('periodoPicker');
+  var open = picker.classList.toggle('open');
+  if (open) renderCalGrid();
+}
+
+document.addEventListener('click', function(e) {
+  var picker = document.getElementById('periodoPicker');
+  if (picker && !picker.contains(e.target) && !e.target.closest('.periodo-pill')) {
+    picker.classList.remove('open');
+  }
+});
+
+function savePeriodo() {
+  try {
+    localStorage.setItem('fortis_periodo', JSON.stringify({
+      desde: calDesde ? calDesde.toISOString() : null,
+      hasta: calHasta ? calHasta.toISOString() : null
+    }));
+  } catch(e) {}
+}
+
+function loadPeriodo() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('fortis_periodo') || '{}');
+    if (saved.desde) calDesde = new Date(saved.desde);
+    if (saved.hasta) calHasta = new Date(saved.hasta);
+    updatePeriodoLabel();
+  } catch(e) {}
+}
+
+function saveManual() {
+  try {
+    localStorage.setItem('fortis_manual', JSON.stringify({
+      bruta: unformatContabVal(document.getElementById('cManualBruta').value),
+      neta:  unformatContabVal(document.getElementById('cManualNeta').value)
+    }));
+  } catch(e) {}
+}
+
+function loadManual() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('fortis_manual') || '{}');
+    if (saved.bruta) document.getElementById('cManualBruta').value = formatContabVal(saved.bruta);
+    if (saved.neta)  document.getElementById('cManualNeta').value  = formatContabVal(saved.neta);
+  } catch(e) {}
+}
+
+function setDistType(key, type) {
+  distTypes[key] = type;
+  var K = key.charAt(0).toUpperCase() + key.slice(1);
+  document.getElementById('dt' + K + 'Pct').classList.toggle('active', type === 'pct');
+  document.getElementById('dt' + K + 'Fijo').classList.toggle('active', type === 'fijo');
+  document.getElementById('d' + K + 'Unit').textContent = type === 'pct' ? '%' : 'ARS';
+  saveStrategy();
+  renderContab();
+}
+
+function getIngresos() {
+  return {
+    bruta: unformatContabVal(document.getElementById('cManualBruta').value),
+    neta:  unformatContabVal(document.getElementById('cManualNeta').value)
+  };
+}
+
+function getTotalGastos() {
+  var pack  = unformatContabVal(document.getElementById('gPackaging').value);
+  var envios= unformatContabVal(document.getElementById('gEnvios').value);
+  var imps  = unformatContabVal(document.getElementById('gImpuestos').value);
+  var anun  = unformatContabVal(document.getElementById('gAnuncios').value);
+  var custom = customGastos.reduce(function(s,g){ return s + (parseFloat(g.monto)||0); }, 0);
+  return pack + envios + imps + anun + custom;
+}
+
+function getDistMontos(disponible) {
+  var rv = parseFloat(document.getElementById('dRestockVal').value) || 0;
+  var sv = parseFloat(document.getElementById('dSueldoVal').value)  || 0;
+  var rv2= parseFloat(document.getElementById('dReservaVal').value) || 0;
+  var restock = distTypes.restock === 'pct' ? disponible * rv  / 100 : Math.min(rv,  disponible);
+  var sueldo  = distTypes.sueldo  === 'pct' ? disponible * sv  / 100 : Math.min(sv,  disponible);
+  var reserva = distTypes.reserva === 'pct' ? disponible * rv2 / 100 : Math.min(rv2, disponible);
+  return { restock: Math.round(restock), sueldo: Math.round(sueldo), reserva: Math.round(reserva) };
+}
+
+function renderContab() {
+  var ing = getIngresos();
+  var totalGastos = getTotalGastos();
+  var disponible = Math.max(0, ing.neta - totalGastos);
+
+  // Header neta label in distribution card
+  var netaLbl = document.getElementById('netaDistLabel');
+  if (netaLbl) netaLbl.textContent = ing.neta > 0 ? '$' + ing.neta.toLocaleString('es-AR') : '$0';
+
+  // Gastos bar
+  var gastosResult = document.getElementById('dGastosResult');
+  var gastosBar    = document.getElementById('dGastosBar');
+  if (gastosResult) gastosResult.textContent = '$' + totalGastos.toLocaleString('es-AR');
+  if (gastosBar)    gastosBar.style.width = ing.neta > 0 ? Math.min(100, (totalGastos / ing.neta) * 100) + '%' : '0%';
+
+  // Disponible label
+  var dispMonto = document.getElementById('disponibleMonto');
+  if (dispMonto) {
+    dispMonto.textContent = '$' + disponible.toLocaleString('es-AR');
+    dispMonto.style.color = disponible > 0 ? '#15803d' : '#dc2626';
+  }
+
+  // Distribution bars (based on disponible)
+  var dist = getDistMontos(disponible);
+  var base = disponible > 0 ? disponible : 1;
+  document.getElementById('dRestockResult').textContent = '$' + dist.restock.toLocaleString('es-AR');
+  document.getElementById('dSueldoResult').textContent  = '$' + dist.sueldo.toLocaleString('es-AR');
+  document.getElementById('dReservaResult').textContent = '$' + dist.reserva.toLocaleString('es-AR');
+  document.getElementById('dRestockBar').style.width = Math.min(100, (dist.restock / base) * 100) + '%';
+  document.getElementById('dSueldoBar').style.width  = Math.min(100, (dist.sueldo  / base) * 100) + '%';
+  document.getElementById('dReservaBar').style.width = Math.min(100, (dist.reserva / base) * 100) + '%';
+
+}
+
+function renderRestockTable(restockBudget) {
+  var lista = products.filter(function(p){ return p.estado !== 'Descartado'; });
+  if (!lista.length) {
+    document.getElementById('restockTable').innerHTML = '<p style="text-align:center;color:#a1a1aa;padding:24px;font-size:13px">Agrega productos al tracker para ver recomendaciones.</p>';
+    return;
+  }
+  lista.sort(function(a,b){ return calcNet(b).margen - calcNet(a).margen; });
+  var rows = lista.map(function(p) {
+    var r = calcNet(p);
+    var inv = p.mayor * p.moq;
+    var badge = restockBudget >= inv && restockBudget > 0
+      ? '<span class="restock-alcanza">✓ Alcanza</span>'
+      : '<span class="restock-notalcanza">Faltan $' + Math.max(0, inv - restockBudget).toLocaleString('es-AR') + '</span>';
+    var estadoMap = { Activo:'bg-green', Testear:'bg-blue', Analizar:'bg-yellow', Descartado:'bg-gray' };
+    return '<tr>' +
+      '<td><strong>' + p.nombre + '</strong><br><span style="font-size:10px;color:#71717a">' + (p.proveedor||'—') + '</span></td>' +
+      '<td><span class="badge ' + (estadoMap[p.estado]||'bg-gray') + '">' + p.estado + '</span></td>' +
+      '<td style="font-weight:700;color:#2563eb">$' + p.mayor.toLocaleString('es-AR') + '/u</td>' +
+      '<td><strong>' + p.moq + ' u</strong> → <span style="color:#7c3aed;font-weight:700">$' + inv.toLocaleString('es-AR') + '</span></td>' +
+      '<td style="font-weight:800;color:' + (r.margen >= 30 ? '#16a34a' : r.margen >= 15 ? '#d97706' : '#dc2626') + '">' + r.margen + '%</td>' +
+      '<td>' + badge + '</td>' +
+      '</tr>';
+  }).join('');
+  document.getElementById('restockTable').innerHTML =
+    '<table class="restock-table"><thead><tr>' +
+      '<th>Producto</th><th>Estado</th><th>Precio mayor</th><th>Inversión MOQ</th><th>Margen</th><th>Con tu presupuesto</th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+function renderCustomGastos() {
+  var grid = document.getElementById('gastoMiniGrid');
+  if (!grid) return;
+  // Remove old custom cards (they have data-custom attr)
+  grid.querySelectorAll('[data-custom]').forEach(function(el){ el.remove(); });
+  var addBtn = grid.querySelector('.add-mini-btn');
+  customGastos.forEach(function(g, i) {
+    var card = document.createElement('div');
+    card.className = 'gasto-mini-card custom';
+    card.setAttribute('data-custom', i);
+    card.innerHTML =
+      '<button class="gasto-mini-del" onclick="removeGasto(' + i + ')">×</button>' +
+      '<div class="gasto-mini-label">🏷️ ' + (g.nombre || 'Gasto ' + (i+1)) + '</div>' +
+      '<input class="gasto-mini-input" type="number" placeholder="0" value="' + (g.monto||'') + '" ' +
+        'oninput="customGastos[' + i + '].monto=parseFloat(this.value)||0; saveGastos(); renderContab();">';
+    grid.insertBefore(card, addBtn);
+  });
+}
+
+function addGasto() {
+  var pending = document.getElementById('pendingGastoRow');
+  if (pending) { pending.querySelector('.pending-nombre').focus(); return; }
+  var grid = document.getElementById('gastoMiniGrid');
+  var addBtn = grid.querySelector('.add-mini-btn');
+  var row = document.createElement('div');
+  row.id = 'pendingGastoRow';
+  row.className = 'gasto-mini-card custom';
+  row.style.cssText = 'background:#f0fdf4;border-color:#86efac;display:flex;flex-direction:column;gap:6px';
+  row.innerHTML =
+    '<input class="pending-nombre" type="text" placeholder="Nombre..." ' +
+      'style="border:none;background:transparent;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#15803d;outline:none;padding:0" ' +
+      'onkeydown="if(event.key===\'Enter\') confirmGasto()">' +
+    '<div style="display:flex;gap:4px">' +
+      '<button onclick="confirmGasto()" style="flex:1;background:#16a34a;border:none;border-radius:5px;color:#fff;font-size:12px;padding:3px;cursor:pointer">✅</button>' +
+      '<button onclick="cancelGasto()" style="flex:1;background:#f4f4f5;border:none;border-radius:5px;color:#52525b;font-size:12px;padding:3px;cursor:pointer">✕</button>' +
+    '</div>';
+  grid.insertBefore(row, addBtn);
+  row.querySelector('.pending-nombre').focus();
+}
+
+function confirmGasto() {
+  var row = document.getElementById('pendingGastoRow');
+  if (!row) return;
+  var nombre = row.querySelector('.pending-nombre').value.trim();
+  if (!nombre) { row.querySelector('.pending-nombre').focus(); return; }
+  row.remove();
+  customGastos.push({ id: customGastoId++, nombre: nombre, monto: 0 });
+  renderCustomGastos();
+  saveGastos();
+  renderContab();
+}
+
+function cancelGasto() {
+  var row = document.getElementById('pendingGastoRow');
+  if (row) row.remove();
+}
+
+function removeGasto(idx) {
+  customGastos.splice(idx, 1);
+  renderCustomGastos();
+  saveGastos();
+  renderContab();
+}
+
+function saveGastos() {
+  try {
+    localStorage.setItem('fortis_gastos', JSON.stringify({
+      packaging:  unformatContabVal(document.getElementById('gPackaging').value),
+      envios:     unformatContabVal(document.getElementById('gEnvios').value),
+      impuestos:  unformatContabVal(document.getElementById('gImpuestos').value),
+      anuncios:   unformatContabVal(document.getElementById('gAnuncios').value),
+      custom: customGastos
+    }));
+  } catch(e) {}
+}
+
+function saveStrategy() {
+  try {
+    localStorage.setItem('fortis_strategy', JSON.stringify({
+      distTypes:  distTypes,
+      restockVal: document.getElementById('dRestockVal').value,
+      sueldoVal:  document.getElementById('dSueldoVal').value,
+      reservaVal: document.getElementById('dReservaVal').value
+    }));
+  } catch(e) {}
+}
+
+function fmtMini(v) { return v ? Number(v).toLocaleString('es-AR') : ''; }
+function loadGastos() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('fortis_gastos') || '{}');
+    if (saved.packaging)  document.getElementById('gPackaging').value  = fmtMini(saved.packaging);
+    if (saved.envios)     document.getElementById('gEnvios').value     = fmtMini(saved.envios);
+    if (saved.impuestos)  document.getElementById('gImpuestos').value  = fmtMini(saved.impuestos);
+    if (saved.anuncios)   document.getElementById('gAnuncios').value   = fmtMini(saved.anuncios);
+    if (saved.custom)     { customGastos = saved.custom; renderCustomGastos(); }
+  } catch(e) {}
+}
+
+function loadStrategy() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('fortis_strategy') || '{}');
+    if (saved.distTypes) distTypes = saved.distTypes;
+    if (saved.restockVal) document.getElementById('dRestockVal').value = saved.restockVal;
+    if (saved.sueldoVal)  document.getElementById('dSueldoVal').value  = saved.sueldoVal;
+    if (saved.reservaVal) document.getElementById('dReservaVal').value = saved.reservaVal;
+    ['restock','sueldo','reserva'].forEach(function(k) {
+      var t = distTypes[k] || 'pct';
+      var K = k.charAt(0).toUpperCase() + k.slice(1);
+      document.getElementById('dt' + K + 'Pct').classList.toggle('active', t === 'pct');
+      document.getElementById('dt' + K + 'Fijo').classList.toggle('active', t === 'fijo');
+      document.getElementById('d' + K + 'Unit').textContent = t === 'pct' ? '%' : 'ARS';
+    });
+  } catch(e) {}
+}
 </script>
 
 <!-- SUPABASE SETUP MODAL -->
